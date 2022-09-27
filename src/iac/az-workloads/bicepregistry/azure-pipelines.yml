@@ -43,6 +43,8 @@ stages:
 
                 Write-Host "Creating resource group..."
 
+                Get-ChildItem -Recurse
+
                 $resourceGroup = az deployment sub create `
                     -f "/src/iac/az-workloads/bicepregistry/resourcegroup.bicep" `
                     -l $Location `
