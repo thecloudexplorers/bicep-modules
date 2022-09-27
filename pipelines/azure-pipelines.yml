@@ -2,9 +2,9 @@ trigger:
   branches:
     include:
       - feature/*
-  paths:
-    include:
-      - src/*
+  # paths:
+  #   include:
+  #     - src/*
 
 pool:
   vmImage: windows-latest
@@ -49,6 +49,7 @@ stages:
               # Write-Output "bicepModuleVersion=$($versionFile.version)" >> $env:GITHUB_ENV
               # Write-Output "bicepModuleName=$($versionFile.module)" >> $env:GITHUB_ENV
             workingDirectory: $(Build.SourcesDirectory)
+            displayName: 'Get version'
             enabled: true
 
           - powershell: |
@@ -67,3 +68,20 @@ stages:
               }
             displayName: Validate changed files
             enabled: true
+
+          - powershell: |
+              $tagVersion = "$env:bicepModuleName-v$env:bicepModuleVersion"
+              Write-Host $tagVersion
+
+              $existingTag = git tag -l $tagVersion
+
+              if($existingTag){
+                Write-Error "Version '$tagVersion' already exist"
+              }
+
+              Write-Host "Generating tag '$tagVersion'"
+              git tag $tagVersion
+
+              git tag -l
+              # git push --tags
+            workingDirectory: $(Build.SourcesDirectory)
