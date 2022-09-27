@@ -34,7 +34,6 @@ stages:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
               scriptLocation: "inlineScript"
-              workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 $WorkloadAffix = "${{ parameters.WorkloadAffix }}"
                 $ApplicationSufix = "${{ parameters.ApplicationSufix }}"
