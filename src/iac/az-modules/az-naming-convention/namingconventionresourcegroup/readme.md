@@ -1,5 +1,5 @@
 ## Purpose
-This module provides a naming convention for Azure Resource Groups based on the [Matroska naming convention](https://www.devjev.nl/posts/2022/the-perfect-azure-naming-convention/sizewise-subscription-env.svg) proposed by Jev Suchoi.
+This module provides a naming convention for Azure Resource Groups based on the [Matroska naming convention](https://www.devjev.nl/posts/2022/the-perfect-azure-naming-convention/) proposed by Jev Suchoi.
 
 ## Requirements
 
