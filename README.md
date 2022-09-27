@@ -6,6 +6,10 @@ The repository is organized in modules and workloads.
 
   - [Modules](#modules)
   - [Workloads](#workloads)
+  - [Available Modules](#available-modules)
+    - [Naming Convention](#naming-convention)
+    - [Azure Resources](#azure-resources)
+  - [Available Workloads](#available-workloads)
 
 ## Modules
 Modules contains low level implementation of Azure resources, it contains ideally one resource, which must be combined with other resources at Workload level. In certain cases, for some resources might be necessary include extra resources.
@@ -18,5 +22,8 @@ Workloads are sets of Azure resources that supports a defined process. In this r
 
 ### Naming Convention
 - [Resource Group Naming Convention](src/iac/az-modules/az-naming-convention/namingconventionresourcegroup/README.md)
+
+### Azure Resources
+- [Resource Group](src/iac/az-modules/az-resources/Microsoft.Resources/resourcegroup/README.md)
 
 ## Available Workloads
