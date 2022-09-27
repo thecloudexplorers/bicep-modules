@@ -2,6 +2,10 @@ trigger:
   branches:
     include:
       - master
+      - feature/*
+  paths:
+    include:
+      - src/iac/*
 
 pool:
   vmImage: windows-latest
@@ -36,10 +40,14 @@ stages:
 
               $versionFile = Get-Content -Raw -Path $versionFile | ConvertFrom-Json
 
+              if($branch -like "*/feature/*"){
+                $preRelease = "-pre-release"
+              }
+
               Write-Host "Module changed: '$($versionFile.module)'"
               Write-Host "Module version: '$($versionFile.version)'"
 
-              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$($versionFile.version)"
+              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$($versionFile.version)$preRelease"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
 
