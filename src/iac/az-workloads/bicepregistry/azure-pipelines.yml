@@ -44,7 +44,7 @@ stages:
                 Write-Host "Creating resource group..."
 
                 $resourceGroup = az deployment sub create `
-                    -f "./resourcegroup.bicep" `
+                    -f "/src/iac/az-workloads/bicepregistry/resourcegroup.bicep" `
                     -l $Location `
                     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix environment="$Environment" `
                     -o json | ConvertFrom-Json
