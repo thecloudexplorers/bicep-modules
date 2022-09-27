@@ -82,6 +82,6 @@ stages:
               Write-Host "Generating tag '$tagVersion'"
               git tag $tagVersion
 
-              git tag -l
-              # git push --tags
+              git push --tags
             workingDirectory: $(Build.SourcesDirectory)
+            displayName: 'Generate git tag'
