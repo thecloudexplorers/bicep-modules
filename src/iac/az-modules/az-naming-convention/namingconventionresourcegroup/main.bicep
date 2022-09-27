@@ -4,7 +4,7 @@ targetScope = 'subscription'
 
 @description('Business workload affix.')
 @minLength(1)
-@maxLength(3)
+@maxLength(2)
 param workloadAffix string = 'wl'
 
 @description('Application sufix.')
