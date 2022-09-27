@@ -1,10 +1,7 @@
 trigger:
   branches:
     include:
-      - feature/*
-  paths:
-    include:
-      - src/iac/*
+      - main
 
 pool:
   vmImage: windows-latest
