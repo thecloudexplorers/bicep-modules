@@ -1,5 +1,5 @@
 ## Purpose
-This module provision an Azure Resource Groups.
+This module provision an Azure Resource Group.
 
 ## Requirements
 
