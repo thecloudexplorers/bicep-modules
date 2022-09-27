@@ -4,7 +4,7 @@ trigger:
       - feature/*
   paths:
     include:
-      - src/iac/az-workloads/*
+      - src/iac/*
 
 pool:
   vmImage: windows-latest
