@@ -45,7 +45,7 @@ stages:
                 Get-ChildItem -Recurse
 
                 $resourceGroup = az deployment sub create `
-                    -f " $(Build.SourcesDirectory)/src/iac/az-workloads/bicepregistry/resourcegroup.bicep" `
+                    -f "/src/iac/az-workloads/bicepregistry/resourcegroup.bicep" `
                     -l $Location `
                     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix environment="$Environment" `
                     -o json | ConvertFrom-Json
