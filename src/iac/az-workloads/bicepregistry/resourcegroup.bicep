@@ -1,17 +1,18 @@
+targetScope = 'subscription'
 
 @description('Azure Bicep Registry location.')
-param location string
+param location string = deployment().location
 
 @description('Azure tags.')
 param tags object = {}
 
 @description('Workload affix of the Azure Bicep.')
-param workloadAffix string = 'wc'
+param workloadAffix string
 
 @description('Application sufix.')
 @minLength(1)
 @maxLength(3)
-param applicationSufix string = 'app'
+param applicationSufix string
 
 @allowed([
   'exp'
@@ -24,7 +25,6 @@ param environment string = 'exp'
 module rgNaming '../../az-modules/az-naming-convention/namingconventionresourcegroup/main.bicep' = {
 
   name: 'rgNaming'
-  scope: subscription()
   params: {
     workloadAffix: workloadAffix
     applicationSufix: applicationSufix
@@ -34,7 +34,6 @@ module rgNaming '../../az-modules/az-naming-convention/namingconventionresourceg
 
 module resourceGroup '../../az-modules/az-resources/Microsoft.Resources/resourcegroup/main.bicep' = {
   name: 'resourceGroup'
-  scope: subscription()
   params: {
     name: rgNaming.outputs.resourceGroupName
     location: location

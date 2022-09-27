@@ -1,0 +1,130 @@
+parameters:
+  - name: WorkloadAffix
+    type: string
+    default: br
+  - name: ApplicationSufix
+    type: string
+    default: bcp
+  - name: Location
+    type: string
+    default: westeurope
+  - name: Environment
+    type: string
+    default: exp
+
+trigger:
+  branches:
+    include:
+      - feature/*
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: dev
+    jobs:
+      - job: BootstrapBicepRegistry
+        displayName: Bootstrap Bicep Registry
+        steps:
+
+          - task: AzureCLI@2
+            displayName: Deploy Azure Container Registry
+            enabled: true
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                $WorkloadAffix = "${{ parameters.WorkloadAffix }}"
+                $ApplicationSufix = "${{ parameters.ApplicationSufix }}"
+                $Location = "${{ parameters.Location }}"
+                $Environment = "${{ parameters.Environment }}"
+
+                Write-Host "Creating resource group..."
+
+                $resourceGroup = az deployment sub create `
+                    -f "./resourcegroup.bicep" `
+                    -l $Location `
+                    --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix environment="$Environment" `
+                    -o json | ConvertFrom-Json
+
+                # Write-Host "Creating container registry..."
+
+                # $acrDeploy = az deployment group create `
+                #     -f "./src/solutions/bicepRegistryBootstrap/azureContainerRegistry/main.bicep" `
+                #     -g $resourceGroup.Properties.Outputs.resourceGroupName.value `
+                #     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix instanceNumber=001 environment="$Environment" `
+                #     | ConvertFrom-Json -Depth 10
+
+                # Write-Host $acrDeploy
+
+                # $acrId = $acrDeploy.properties.outputs.acrId.value
+
+                # Write-Host $acrId
+
+                # Write-Host "##vso[task.setvariable variable=acrId]$acrId"
+
+          - task: AzureCLI@2
+            displayName: Deploy bicep modules to ACR
+            enabled: false
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                Write-Host "Pushing existing modules to ACR '$(acrId)'..."
+
+                $coreModules = "$(Build.SourcesDirectory)/src/modules"
+
+                $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
+
+                foreach ($versionFilePath in $versionFiles) {
+                  Write-Host "Processing $($versionFilePath.FullName)"
+
+                  $versionFile = Get-Content -Raw -Path $versionFilePath.FullName | ConvertFrom-Json
+
+                  Write-Host "Pushing bicep module '$($versionFile.module)' to ACR"
+
+                  Write-Host "Module: '$($versionFile.module)'"
+                  Write-Host "Module version: '$($versionFile.version)'"
+
+                  $bicepModule = $versionFilePath.FullName.Replace("version.json", "main.bicep")
+
+                  az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$($versionFile.module):v$($versionFile.version)"
+                }
+
+          - task: AzureCLI@2
+            displayName: Tagging bicep modules
+            enabled: false
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                Write-Host "Loading existing modules..."
+
+                $coreModules = "$(Build.SourcesDirectory)/src/modules"
+
+                $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
+
+                foreach ($versionFilePath in $versionFiles) {
+                  Write-Host "Processing $($versionFilePath.FullName)"
+
+                  $versionFile = Get-Content -Raw -Path $versionFilePath.FullName | ConvertFrom-Json
+
+                  $gitTagVersion = "$($versionFile.module)-v$($versionFile.version)"
+
+                  Write-Host "Creating git tag: '$gitTagVersion'"
+
+                  $existingTag = git tag -l $gitTagVersion
+
+                  if($existingTag){
+                    Write-Host "##[warning]Version '$gitTagVersion' already exist"
+                  }else{
+                    Write-Host "Generating tag '$gitTagVersion'"
+                    git tag $gitTagVersion
+                    git push --tags
+                  }
+                }
