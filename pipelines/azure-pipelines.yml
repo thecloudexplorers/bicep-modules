@@ -101,8 +101,8 @@ stages:
               if($branch -like "*feature/test"){
                 $preRelease = ".$(revision)-pre-release"
 
-                $env:bicepModuleName
-                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName*pre-release*" }
+                $env:bicepModuleVersion
+                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v*pre-release*" }
 
                 $preReleases
 
