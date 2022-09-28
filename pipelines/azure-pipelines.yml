@@ -24,7 +24,7 @@ stages:
 
               $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
 
-              Write-Host "Last tag: $lastTag"
+              Write-Host "Latest tag: $lastTag"
               Write-Host "Branch: $(Build.SourceBranch)"
 
               $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
@@ -43,12 +43,16 @@ stages:
 
               if($branch -like "*/feature/*"){
                 $preRelease = ".$(revision)-pre-release"
+                $bicepModuleVersion = $versionFile.version + $preRelease
+              }
+              else{
+                $bicepModuleVersion = $versionFile.version
               }
 
               Write-Host "Module changed: '$($versionFile.module)'"
-              Write-Host "Module version: '$($versionFile.version)'"
+              Write-Host "Module version: '$bicepModuleVersion'"
 
-              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$($versionFile.version)$preRelease"
+              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$bicepModuleVersion"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
 
@@ -93,16 +97,24 @@ stages:
             displayName: "Generate git tag"
 
           - powershell: |
-              if($branch -like "*/test"){
+              $branch = "$(Build.SourceBranch)"
+
+              Write-Host "Branch: $branch"
+              $branch -like "*feature/test"
+
+              if($branch -like "*feature/test"){
                 $preRelease = ".$(revision)-pre-release"
 
-                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*pre-release*" }
+                $env:bicepModuleVersion
+                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion" }
 
-                foreach($preRelease in $preReleases){
-                  Write-Host "Removing pre release version: $preRelease"
-                  git push delete origin $preRelease
-                }
+                $preReleases
+
+                # foreach($preRelease in $preReleases){
+                #   Write-Host "Removing pre release version: $preRelease"
+                #   git push delete origin $preRelease
+                # }
               }
 
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: "Removing pre releases of version v$env:bicepModuleVersion"
+            displayName: "Removing pre releases of version v$(bicepModuleVersion)"
