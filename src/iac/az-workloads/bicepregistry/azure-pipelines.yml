@@ -164,7 +164,7 @@ stages:
 
           - task: AzureCLI@2
             displayName: Tagging bicep modules
-            enabled: false
+            enabled: true
             condition: eq(${{ parameters.GitTagVersions }}, 'true')
             inputs:
               azureSubscription: "ServicePrincipal"
