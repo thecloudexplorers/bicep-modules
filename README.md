@@ -30,4 +30,4 @@ Workloads are sets of Azure resources that supports a defined process. In this r
 
 ## Available Workloads
 
-- [Bootstrap Bicep Registry](src\iac\az-workloads\bicepregistry\README.md)
+- [Bootstrap Bicep Registry](src/iac/az-workloads/bicepregistry/README.md)
