@@ -89,7 +89,7 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                $bicepModule = $(versionFileName).Replace("version.json", "main.bicep")
+                $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
                 az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$env:bicepModuleName:v$env:bicepModuleVersion"
 
           - powershell: |
