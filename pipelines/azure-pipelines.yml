@@ -101,14 +101,15 @@ stages:
               if($branch -like "*feature/test"){
                 $preRelease = ".$(revision)-pre-release"
 
-                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*pre-release*" }
+                $env:bicepModuleName
+                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName*pre-release*" }
 
                 $preReleases
 
-                foreach($preRelease in $preReleases){
-                  Write-Host "Removing pre release version: $preRelease"
-                  git push delete origin $preRelease
-                }
+                # foreach($preRelease in $preReleases){
+                #   Write-Host "Removing pre release version: $preRelease"
+                #   git push delete origin $preRelease
+                # }
               }
 
             workingDirectory: $(Build.SourcesDirectory)
