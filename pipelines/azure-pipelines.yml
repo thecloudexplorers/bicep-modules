@@ -43,12 +43,16 @@ stages:
 
               if($branch -like "*/feature/*"){
                 $preRelease = ".$(revision)-pre-release"
+                $bicepModuleVersion = $versionFile.version + $preRelease
+              }
+              else{
+                $bicepModuleVersion = $versionFile.version
               }
 
               Write-Host "Module changed: '$($versionFile.module)'"
-              Write-Host "Module version: '$($versionFile.version)'"
+              Write-Host "Module version: '$bicepModuleVersion'"
 
-              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$($versionFile.version)$preRelease"
+              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$bicepModuleVersion"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
 
