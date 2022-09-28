@@ -161,7 +161,7 @@ stages:
           - task: AzureCLI@2
             displayName: Tagging bicep modules
             enabled: true
-            condition: and(eq(${{ parameters.GitTagVersions }}, 'true'), eq(${{ parameters.DeployACR }}, 'true'))
+            condition: eq(${{ parameters.GitTagVersions }}, 'true')
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
