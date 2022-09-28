@@ -12,6 +12,9 @@ stages:
     jobs:
       - job: BicepModulesDeploy
         displayName: Bicep Modules Deploy
+        variables:
+          - name: revision
+            value: $[counter('$(Build.SourceBranch)', 0)]
         steps:
           - checkout: self
             persistCredentials: true
@@ -40,7 +43,7 @@ stages:
               $versionFile = Get-Content -Raw -Path $versionFile | ConvertFrom-Json
 
               if($branch -like "*/feature/*"){
-                $preRelease = "-pre-release"
+                $preRelease = ".$(revision)-pre-release"
               }
 
               Write-Host "Module changed: '$($versionFile.module)'"
