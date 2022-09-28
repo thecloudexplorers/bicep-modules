@@ -90,7 +90,10 @@ stages:
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
-                az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$(bicepModuleName):v$(bicepModuleVersion)"
+                $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
+
+                Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
+                az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
 
           - powershell: |
               $tagVersion = "$env:bicepModuleName-v$env:bicepModuleVersion"
