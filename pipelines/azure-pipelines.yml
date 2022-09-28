@@ -95,19 +95,19 @@ stages:
               git push --tags
             workingDirectory: $(Build.SourcesDirectory)
             displayName: "Generate git tag"
-            enabled: false
+            enabled: true
 
           - powershell: |
-              Write-Host "Removing pre releases of version v$env:bicepModuleVersion"
               $branch = "$(Build.SourceBranch)"
 
-              if($branch -like "*main"){
-                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*-pre-release" }
+              Write-Host "Removing pre releases of version v$env:bicepModuleVersion"
 
-                foreach($preRelease in $preReleases){
-                  Write-Host "Removing pre release version: $preRelease"
-                  git push --delete origin $preRelease
-                }
+              $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*-pre-release" }
+
+              foreach($preRelease in $preReleases){
+                Write-Host "Removing pre release version: $preRelease"
+                git push --delete origin $preRelease
               }
             workingDirectory: $(Build.SourcesDirectory)
             displayName: "Remove pre releases"
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
