@@ -24,11 +24,6 @@ parameters:
     type: string
     default: dev
 
-trigger:
-  branches:
-    include:
-      - feature/*
-
 pool:
   vmImage: windows-latest
 
