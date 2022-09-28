@@ -14,6 +14,8 @@ stages:
         variables:
           - name: revision
             value: $[counter('$(Build.SourceBranch)', 0)]
+          - template: pipelines/config/vars.yml
+
         steps:
           - checkout: self
             persistCredentials: true
@@ -29,13 +31,13 @@ stages:
 
               $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
 
-              $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
+              $versionFileName = (git diff --name-only $lastTag $branch) -match "/version.json"
 
-              if($versionFile.Count -gt 1){
-                Write-Host $versionFile
+              if($versionFileName.Count -gt 1){
+                Write-Host $versionFileName
                 Write-Error "More than one version file updated"
 
-              }elseif($null -eq $versionFile -or $versionFile.Count -eq 0 -or $versionFile -eq $false){
+              }elseif($null -eq $versionFileName -or $versionFileName.Count -eq 0 -or $versionFileName -eq $false){
                 Write-Error "No version files were updated"
               }
 
@@ -54,10 +56,7 @@ stages:
 
               Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$bicepModuleVersion"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
-
-
-              # Write-Output "bicepModuleVersion=$($versionFile.version)" >> $env:GITHUB_ENV
-              # Write-Output "bicepModuleName=$($versionFile.module)" >> $env:GITHUB_ENV
+              Write-Host "##vso[task.setvariable variable=versionFileName]$versionFileName"
             workingDirectory: $(Build.SourcesDirectory)
             displayName: "Get version"
             enabled: true
@@ -68,7 +67,7 @@ stages:
 
               $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
 
-              $changedFiles = (git diff --name-only $lastTag $branch) | Where-Object { $_ -like "*src/modules*" }
+              $changedFiles = (git diff --name-only $lastTag $branch) | Where-Object { $_ -like "*src/iac*" }
 
               foreach ($file in $changedFiles ) {
                   Write-Host "Validating: '$file'"
@@ -78,6 +77,18 @@ stages:
               }
             displayName: Validate changed files
             enabled: true
+
+          - task: AzureCLI@2
+            displayName: Deploy bicep modules to ACR
+            enabled: true
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                $bicepModule = $versionFileName.Replace("version.json", "main.bicep")
+                az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$env:bicepModuleName:v$env:bicepModuleVersion"
 
           - powershell: |
               $tagVersion = "$env:bicepModuleName-v$env:bicepModuleVersion"
