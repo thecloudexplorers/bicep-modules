@@ -93,24 +93,24 @@ stages:
               inlineScript: |
                 Write-Host "Pushing existing modules to ACR '$(acrId)'..."
 
-                # $coreModules = "$(Build.SourcesDirectory)/src/modules"
+                $coreModules = "$(Build.SourcesDirectory)/src/iac/az-modules"
 
-                # $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
+                $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
 
-                # foreach ($versionFilePath in $versionFiles) {
-                #   Write-Host "Processing $($versionFilePath.FullName)"
+                foreach ($versionFilePath in $versionFiles) {
+                  Write-Host "Processing $($versionFilePath.FullName)"
 
-                #   $versionFile = Get-Content -Raw -Path $versionFilePath.FullName | ConvertFrom-Json
+                  $versionFile = Get-Content -Raw -Path $versionFilePath.FullName | ConvertFrom-Json
 
-                #   Write-Host "Pushing bicep module '$($versionFile.module)' to ACR"
+                  Write-Host "Pushing bicep module '$($versionFile.module)' to ACR"
 
-                #   Write-Host "Module: '$($versionFile.module)'"
-                #   Write-Host "Module version: '$($versionFile.version)'"
+                  Write-Host "Module: '$($versionFile.module)'"
+                  Write-Host "Module version: '$($versionFile.version)'"
 
-                #   $bicepModule = $versionFilePath.FullName.Replace("version.json", "main.bicep")
+                  $bicepModule = $versionFilePath.FullName.Replace("version.json", "main.bicep")
 
-                #   az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$($versionFile.module):v$($versionFile.version)"
-                # }
+                  az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$($versionFile.module):v$($versionFile.version)"
+                }
 
           - task: AzureCLI@2
             displayName: Tagging bicep modules
