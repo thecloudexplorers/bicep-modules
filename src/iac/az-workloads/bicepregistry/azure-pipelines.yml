@@ -28,7 +28,7 @@ stages:
         steps:
 
           - task: AzureCLI@2
-            displayName: Deploy Azure Container Registry
+            displayName: Deploy Azure Resource group
             enabled: true
             inputs:
               azureSubscription: "ServicePrincipal"
@@ -42,8 +42,6 @@ stages:
 
                 Write-Host "Creating resource group..."
 
-                Get-ChildItem -Recurse
-
                 $resourceGroup = az deployment sub create `
                     -f "$(Build.SourcesDirectory)/src/iac/az-workloads/bicepregistry/resourcegroup.bicep" `
                     -l $Location `
@@ -51,21 +49,38 @@ stages:
                     --name resourcegroup-$(Build.BuildId) `
                     -o json | ConvertFrom-Json
 
-                # Write-Host "Creating container registry..."
+                $resourceGroupName = $resourceGroup.Properties.Outputs.resourceGroupName.value
 
-                # $acrDeploy = az deployment group create `
-                #     -f "./src/solutions/bicepRegistryBootstrap/azureContainerRegistry/main.bicep" `
-                #     -g $resourceGroup.Properties.Outputs.resourceGroupName.value `
-                #     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix instanceNumber=001 environment="$Environment" `
-                #     | ConvertFrom-Json -Depth 10
+                Write-Host "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
 
-                # Write-Host $acrDeploy
+          - task: AzureCLI@2
+            displayName: Deploy Azure Container Registry
+            enabled: true
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                $WorkloadAffix = "${{ parameters.WorkloadAffix }}"
+                $ApplicationSufix = "${{ parameters.ApplicationSufix }}"
+                $Location = "${{ parameters.Location }}"
+                $Environment = "${{ parameters.Environment }}"
 
-                # $acrId = $acrDeploy.properties.outputs.acrId.value
+                Write-Host "Creating container registry on Resource Group '$(resourceGroupName)'..."
 
-                # Write-Host $acrId
+                $acrDeploy = az deployment group create `
+                    -f "./src/solutions/bicepRegistryBootstrap/azureContainerRegistry/main.bicep" `
+                    -g $($resourceGroupName) `
+                    --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix instanceNumber=001 environment="$Environment" `
+                    | ConvertFrom-Json -Depth 10
 
-                # Write-Host "##vso[task.setvariable variable=acrId]$acrId"
+                Write-Host $acrDeploy
+
+                $acrId = $acrDeploy.properties.outputs.acrId.value
+
+                Write-Host $acrId
+
+                Write-Host "##vso[task.setvariable variable=acrId]$acrId"
 
           - task: AzureCLI@2
             displayName: Deploy bicep modules to ACR
