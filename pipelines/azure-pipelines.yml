@@ -2,7 +2,6 @@ trigger:
   branches:
     include:
       - master
-      - feature/*
 
 pool:
   vmImage: windows-latest
@@ -12,6 +11,9 @@ stages:
     jobs:
       - job: BicepModulesDeploy
         displayName: Bicep Modules Deploy
+        variables:
+          - name: revision
+            value: $[counter('$(Build.SourceBranch)', 0)]
         steps:
           - checkout: self
             persistCredentials: true
@@ -22,7 +24,7 @@ stages:
 
               $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
 
-              Write-Host "Last tag: $lastTag"
+              Write-Host "Latest tag: $lastTag"
               Write-Host "Branch: $(Build.SourceBranch)"
 
               $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
@@ -30,24 +32,34 @@ stages:
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
               if($versionFile.Count -gt 1){
+                Write-Host $versionFile
                 Write-Error "More than one version file updated"
+
               }elseif($null -eq $versionFile -or $versionFile.Count -eq 0 -or $versionFile -eq $false){
                 Write-Error "No version files were updated"
               }
 
               $versionFile = Get-Content -Raw -Path $versionFile | ConvertFrom-Json
 
-              Write-Host "Module changed: '$($versionFile.module)'"
-              Write-Host "Module version: '$($versionFile.version)'"
+              if($branch -like "*/feature/*"){
+                $preRelease = ".$(revision)-pre-release"
+                $bicepModuleVersion = $versionFile.version + $preRelease
+              }
+              else{
+                $bicepModuleVersion = $versionFile.version
+              }
 
-              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$($versionFile.version)"
+              Write-Host "Module changed: '$($versionFile.module)'"
+              Write-Host "Module version: '$bicepModuleVersion'"
+
+              Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$bicepModuleVersion"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
 
               # Write-Output "bicepModuleVersion=$($versionFile.version)" >> $env:GITHUB_ENV
               # Write-Output "bicepModuleName=$($versionFile.module)" >> $env:GITHUB_ENV
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: 'Get version'
+            displayName: "Get version"
             enabled: true
 
           - powershell: |
@@ -82,4 +94,20 @@ stages:
 
               git push --tags
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: 'Generate git tag'
+            displayName: "Generate git tag"
+            enabled: true
+
+          - powershell: |
+              $branch = "$(Build.SourceBranch)"
+
+              Write-Host "Removing pre releases of version v$env:bicepModuleVersion"
+
+              $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*-pre-release" }
+
+              foreach($preRelease in $preReleases){
+                Write-Host "Removing pre release version: $preRelease"
+                git push --delete origin $preRelease
+              }
+            workingDirectory: $(Build.SourcesDirectory)
+            displayName: "Remove pre releases"
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
