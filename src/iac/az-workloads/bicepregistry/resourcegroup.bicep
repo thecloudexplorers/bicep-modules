@@ -41,15 +41,4 @@ module resourceGroup '../../az-modules/az-resources/Microsoft.Resources/resource
   }
 }
 
-
-// module acr '../../../modules/Microsoft.ContainerRegistry/registry/main.bicep' = {
-//   name: 'acr'
-//   params: {
-//     name: naming.outputs.azContainerRegistryName
-//     location: location
-
-//   }
-// }
-
-// output acrName string = naming.outputs.azContainerRegistryName
-// output acrId string = acr.outputs.loginServer
+output resourceGroupName string = resourceGroup.outputs.name
