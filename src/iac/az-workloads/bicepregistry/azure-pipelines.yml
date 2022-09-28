@@ -70,7 +70,7 @@ stages:
 
                 $acrDeploy = az deployment group create `
                     -f "./src/solutions/bicepRegistryBootstrap/azureContainerRegistry/main.bicep" `
-                    -g $($resourceGroupName) `
+                    -g $(resourceGroupName) `
                     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix instanceNumber=001 environment="$Environment" `
                     | ConvertFrom-Json -Depth 10
 
