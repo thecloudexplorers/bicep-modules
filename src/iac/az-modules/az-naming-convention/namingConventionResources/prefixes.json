@@ -1,0 +1,6 @@
+{
+    "storageAccountPrefix": "stg",
+    "appServicePrefix": "app",
+    "resourceGroupPrefix": "rg",
+    "containerRegistryPrefix": "cr"
+}
