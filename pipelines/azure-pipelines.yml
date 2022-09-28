@@ -28,7 +28,7 @@ stages:
               inlineScript: |
                 Write-Host "Loading existing modules..."
 
-                $coreModules = "$(Build.SourcesDirectory)/src/modules"
+                $coreModules = "$(Build.SourcesDirectory)/src/iac"
 
                 $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
 
