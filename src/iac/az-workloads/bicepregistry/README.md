@@ -1,5 +1,5 @@
 ## Purpose
-This workload provision an Azure Container Registry using the module [Microsoft.ContainerRegistry/registry](src/iac/az-modules/az-resources/Microsoft.ContainerRegistry/registry/README.md).
+This workload provision an Azure Container Registry using the module Microsoft.ContainerRegistry/registry in this repository.
 
 This workload uses relative path reference on this repository, in order to provision the Azure Container Registry to publish other modules.
 
