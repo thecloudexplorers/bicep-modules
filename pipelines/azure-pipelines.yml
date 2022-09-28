@@ -17,41 +17,6 @@ stages:
             persistCredentials: true
             fetchDepth: 0
 
-          - task: AzureCLI@2
-            displayName: Tagging bicep modules
-            enabled: true
-            inputs:
-              azureSubscription: "ServicePrincipal"
-              scriptType: "pscore"
-              scriptLocation: "inlineScript"
-              workingDirectory: $(Build.SourcesDirectory)
-              inlineScript: |
-                Write-Host "Loading existing modules..."
-
-                $coreModules = "$(Build.SourcesDirectory)/src/iac"
-
-                $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
-
-                foreach ($versionFilePath in $versionFiles) {
-                  Write-Host "Processing $($versionFilePath.FullName)"
-
-                  $versionFile = Get-Content -Raw -Path $versionFilePath.FullName | ConvertFrom-Json
-
-                  $gitTagVersion = "$($versionFile.module)-v$($versionFile.version)"
-
-                  Write-Host "Creating git tag: '$gitTagVersion'"
-
-                  $existingTag = git tag -l $gitTagVersion
-
-                  if($existingTag){
-                    Write-Host "##[warning]Version '$gitTagVersion' already exist"
-                  }else{
-                    Write-Host "Generating tag '$gitTagVersion'"
-                    git tag $gitTagVersion
-                    git push --tags
-                  }
-                }
-
           - powershell: |
               Write-Host "Validate version file"
 
