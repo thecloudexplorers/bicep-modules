@@ -102,7 +102,7 @@ stages:
                 $preRelease = ".$(revision)-pre-release"
 
                 $env:bicepModuleVersion
-                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v*pre-release*" }
+                $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion" }
 
                 $preReleases
 
