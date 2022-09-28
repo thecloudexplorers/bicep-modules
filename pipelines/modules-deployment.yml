@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
       - master
+      - feature/*
 
 pool:
   vmImage: windows-latest
@@ -14,6 +15,8 @@ stages:
         variables:
           - name: revision
             value: $[counter('$(Build.SourceBranch)', 0)]
+          - template: /pipelines/config/vars.yml
+
         steps:
           - checkout: self
             persistCredentials: true
@@ -39,6 +42,7 @@ stages:
                 Write-Error "No version files were updated"
               }
 
+              Write-Host "##vso[task.setvariable variable=versionFileName]$versionFile"
               $versionFile = Get-Content -Raw -Path $versionFile | ConvertFrom-Json
 
               if($branch -like "*/feature/*"){
@@ -55,9 +59,6 @@ stages:
               Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$bicepModuleVersion"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
-
-              # Write-Output "bicepModuleVersion=$($versionFile.version)" >> $env:GITHUB_ENV
-              # Write-Output "bicepModuleName=$($versionFile.module)" >> $env:GITHUB_ENV
             workingDirectory: $(Build.SourcesDirectory)
             displayName: "Get version"
             enabled: true
@@ -68,7 +69,7 @@ stages:
 
               $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
 
-              $changedFiles = (git diff --name-only $lastTag $branch) | Where-Object { $_ -like "*src/modules*" }
+              $changedFiles = (git diff --name-only $lastTag $branch) | Where-Object { $_ -like "*src/iac*" }
 
               foreach ($file in $changedFiles ) {
                   Write-Host "Validating: '$file'"
@@ -78,6 +79,21 @@ stages:
               }
             displayName: Validate changed files
             enabled: true
+
+          - task: AzureCLI@2
+            displayName: Deploy bicep modules to ACR
+            enabled: true
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
+                $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
+
+                Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
+                az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
 
           - powershell: |
               $tagVersion = "$env:bicepModuleName-v$env:bicepModuleVersion"

@@ -1,0 +1,3 @@
+variables:
+  - name: acrId
+    value: dotcedevcr001.azurecr.io
