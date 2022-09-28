@@ -3,14 +3,10 @@ parameters:
     type: boolean
     default: true
     displayName: Deploy ACR
-  - name: PushModules
+  - name: PopulateACR
     type: boolean
     default: true
-    displayName: Push Modules
-  - name: PushWorkloads
-    type: boolean
-    default: true
-    displayName: Push Workloads
+    displayName: Populate ACR
   - name: GitTagVersions
     type: boolean
     default: true
@@ -103,7 +99,7 @@ stages:
           - task: AzureCLI@2
             displayName: Deploy bicep modules to ACR
             enabled: true
-            condition: eq(${{ parameters.PushModules }}, 'true')
+            condition: and(eq(${{ parameters.PopulateACR }}, 'true'), eq(${{ parameters.DeployACR }}, 'true'))
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
@@ -134,7 +130,7 @@ stages:
           - task: AzureCLI@2
             displayName: Deploy bicep Workloads to ACR
             enabled: true
-            condition: eq(${{ parameters.PushWorkloads }}, 'true')
+            condition: and(eq(${{ parameters.PopulateACR }}, 'true'), eq(${{ parameters.DeployACR }}, 'true'))
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
@@ -165,7 +161,7 @@ stages:
           - task: AzureCLI@2
             displayName: Tagging bicep modules
             enabled: true
-            condition: eq(${{ parameters.GitTagVersions }}, 'true')
+            condition: and(eq(${{ parameters.GitTagVersions }}, 'true'), eq(${{ parameters.DeployACR }}, 'true'))
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
