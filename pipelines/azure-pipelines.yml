@@ -96,10 +96,14 @@ stages:
               $branch = "$(Build.SourceBranch)"
 
               Write-Host "Branch: $branch"
+              $branch -like "*feature/test"
+
               if($branch -like "*feature/test"){
                 $preRelease = ".$(revision)-pre-release"
 
                 $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*pre-release*" }
+
+                $preReleases
 
                 foreach($preRelease in $preReleases){
                   Write-Host "Removing pre release version: $preRelease"
