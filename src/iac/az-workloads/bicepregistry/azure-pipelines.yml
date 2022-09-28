@@ -69,7 +69,7 @@ stages:
                 Write-Host "Creating container registry on Resource Group '$(resourceGroupName)'..."
 
                 $acrDeploy = az deployment group create `
-                    -f "./src/iac/az-workloads/bicepregistry/workload.bicep" `
+                    -f "./src/iac/az-workloads/bicepregistry/main.bicep" `
                     -g $(resourceGroupName) `
                     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix instanceNumber=001 environment="$Environment" `
                     | ConvertFrom-Json -Depth 10
