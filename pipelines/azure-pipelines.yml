@@ -30,8 +30,9 @@ stages:
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
               if($versionFile.Count -gt 1){
+                Write-Host $versionFile
                 Write-Error "More than one version file updated"
-                Write-Error $versionFile
+
               }elseif($null -eq $versionFile -or $versionFile.Count -eq 0 -or $versionFile -eq $false){
                 Write-Error "No version files were updated"
               }
@@ -52,7 +53,7 @@ stages:
               # Write-Output "bicepModuleVersion=$($versionFile.version)" >> $env:GITHUB_ENV
               # Write-Output "bicepModuleName=$($versionFile.module)" >> $env:GITHUB_ENV
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: 'Get version'
+            displayName: "Get version"
             enabled: true
 
           - powershell: |
@@ -87,4 +88,4 @@ stages:
 
               git push --tags
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: 'Generate git tag'
+            displayName: "Generate git tag"
