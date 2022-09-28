@@ -20,6 +20,11 @@ param applicationSufix string
 ])
 param environment string = 'exp'
 
+@minLength(3)
+@maxLength(3)
+@description('Instance number of the resource on the lifecycle.')
+param instanceNumber string = '001'
+
 module naming '../../az-modules/az-naming-convention/namingConventionResources/main.bicep' = {
 
   name: 'naming'
@@ -27,7 +32,7 @@ module naming '../../az-modules/az-naming-convention/namingConventionResources/m
     workloadAffix: workloadAffix
     applicationSufix: applicationSufix
     environment: environment
-    instanceNumber: '001'
+    instanceNumber: instanceNumber
   }
 }
 
