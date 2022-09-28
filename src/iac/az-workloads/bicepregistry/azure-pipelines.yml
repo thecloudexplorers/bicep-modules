@@ -48,6 +48,7 @@ stages:
                     -f "$(Build.SourcesDirectory)/src/iac/az-workloads/bicepregistry/resourcegroup.bicep" `
                     -l $Location `
                     --parameters workloadAffix=$WorkloadAffix applicationSufix=$ApplicationSufix environment="$Environment" `
+                    --name resourcegroup-$(Build.BuildId) `
                     -o json | ConvertFrom-Json
 
                 # Write-Host "Creating container registry..."
