@@ -97,7 +97,7 @@ stages:
           - task: AzureCLI@2
             displayName: Deploy bicep modules to ACR
             enabled: true
-            condition: eq(parameters.PushModules, 'true')
+            condition: eq(${{ parameters.PushModules }}, 'true')
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
