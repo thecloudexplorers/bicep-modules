@@ -93,7 +93,7 @@ stages:
             displayName: "Generate git tag"
 
           - powershell: |
-              if($(Build.SourceBranch) -like "*feature/test"){
+              if("$(Build.SourceBranch)" -like "*feature/test"){
                 $preRelease = ".$(revision)-pre-release"
 
                 $preReleases = git tag --sort=-committerdate -l | Where {$_ -like "$env:bicepModuleName-v$env:bicepModuleVersion*pre-release*" }
