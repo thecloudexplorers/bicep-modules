@@ -22,8 +22,10 @@ Workloads are sets of Azure resources that supports a defined process. In this r
 
 ### Naming Convention
 - [Resource Group Naming Convention](src/iac/az-modules/az-naming-convention/namingconventionresourcegroup/README.md)
+- [Resource Group Naming Convention](src/iac/az-modules/az-naming-convention/namingConventionResources/README.md)
 
 ### Azure Resources
 - [Resource Group](src/iac/az-modules/az-resources/Microsoft.Resources/resourcegroup/README.md)
+- [Azure Container Registry](src/iac/az-modules/az-resources/Microsoft.ContainerRegistry/registry/README.md)
 
 ## Available Workloads
