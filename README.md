@@ -29,3 +29,5 @@ Workloads are sets of Azure resources that supports a defined process. In this r
 - [Azure Container Registry](src/iac/az-modules/az-resources/Microsoft.ContainerRegistry/registry/README.md)
 
 ## Available Workloads
+
+- [Bootstrap Bicep Registry](src\iac\az-workloads\bicepregistry\README.md)
