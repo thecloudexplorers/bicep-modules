@@ -31,16 +31,17 @@ stages:
 
               $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
 
-              $versionFileName = (git diff --name-only $lastTag $branch) -match "/version.json"
+              $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
-              if($versionFileName.Count -gt 1){
-                Write-Host $versionFileName
+              if($versionFile.Count -gt 1){
+                Write-Host $versionFile
                 Write-Error "More than one version file updated"
 
-              }elseif($null -eq $versionFileName -or $versionFileName.Count -eq 0 -or $versionFileName -eq $false){
+              }elseif($null -eq $versionFile -or $versionFile.Count -eq 0 -or $versionFile -eq $false){
                 Write-Error "No version files were updated"
               }
 
+              Write-Host "##vso[task.setvariable variable=versionFileName]$versionFile"
               $versionFile = Get-Content -Raw -Path $versionFile | ConvertFrom-Json
 
               if($branch -like "*/feature/*"){
@@ -56,7 +57,7 @@ stages:
 
               Write-Host "##vso[task.setvariable variable=bicepModuleVersion]$bicepModuleVersion"
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
-              Write-Host "##vso[task.setvariable variable=versionFileName]$versionFileName"
+
             workingDirectory: $(Build.SourcesDirectory)
             displayName: "Get version"
             enabled: true
