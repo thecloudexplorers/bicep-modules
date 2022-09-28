@@ -94,6 +94,8 @@ stages:
 
           - powershell: |
               $branch = "$(Build.SourceBranch)"
+
+              Write-Host "Branch: $branch"
               if($branch -like "*feature/test"){
                 $preRelease = ".$(revision)-pre-release"
 
@@ -106,4 +108,4 @@ stages:
               }
 
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: "Removing pre releases of version v$env:bicepModuleVersion"
+            displayName: "Removing pre releases of version v$(bicepModuleVersion)"
