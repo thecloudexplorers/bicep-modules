@@ -14,7 +14,7 @@ stages:
         variables:
           - name: revision
             value: $[counter('$(Build.SourceBranch)', 0)]
-          - template: pipelines/config/vars.yml
+          - template: /pipelines/config/vars.yml
 
         steps:
           - checkout: self
