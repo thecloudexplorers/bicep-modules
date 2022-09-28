@@ -113,6 +113,36 @@ stages:
                 }
 
           - task: AzureCLI@2
+            displayName: Deploy bicep Workloads to ACR
+            enabled: true
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                Write-Host "Pushing existing modules to ACR '$(acrId)'..."
+
+                $workloads = "$(Build.SourcesDirectory)/src/iac/az-workloads"
+
+                $versionFiles = Get-ChildItem $workloads -Recurse -Filter "version.json" | Select-Object FullName
+
+                foreach ($versionFilePath in $versionFiles) {
+                  Write-Host "Processing $($versionFilePath.FullName)"
+
+                  $versionFile = Get-Content -Raw -Path $versionFilePath.FullName | ConvertFrom-Json
+
+                  Write-Host "Pushing bicep module '$($versionFile.module)' to ACR"
+
+                  Write-Host "Module: '$($versionFile.module)'"
+                  Write-Host "Module version: '$($versionFile.version)'"
+
+                  $bicepModule = $versionFilePath.FullName.Replace("version.json", "main.bicep")
+
+                  az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/workloads/$($versionFile.module):v$($versionFile.version)"
+                }
+
+          - task: AzureCLI@2
             displayName: Tagging bicep modules
             enabled: false
             inputs:
@@ -121,9 +151,9 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                Write-Host "Loading existing modules..."
+                Write-Host "Loading existing modules and workloads..."
 
-                $coreModules = "$(Build.SourcesDirectory)/src/modules"
+                $coreModules = "$(Build.SourcesDirectory)/src/iac"
 
                 $versionFiles = Get-ChildItem $coreModules -Recurse -Filter "version.json" | Select-Object FullName
 
