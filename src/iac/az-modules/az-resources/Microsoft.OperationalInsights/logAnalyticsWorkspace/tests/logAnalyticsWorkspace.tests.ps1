@@ -6,6 +6,8 @@ BeforeAll {
         # TODO: Parametrize for local testing
         Template      = "src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep"
         ResourceGroup = "rg-bicepmodules"
+        # Randon id to avoid collisions
+        RunId         = (Get-Random -Minimum 1000 -Maximum 9999)
     }
 }
 
@@ -22,7 +24,7 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
                     name="log-pesterrun" `
                     location="westeurope" `
                     sku="PerGB2018" `
-                    resourceTags=$tags `
+                    tags=$tags `
                 | ConvertFrom-Json
 
             $deploymentState = $deployment.properties.provisioningState
