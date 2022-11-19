@@ -106,7 +106,7 @@ stages:
             scriptType: 'pscore'
             scriptLocation: 'inlineScript'
             inlineScript: |
-              $container = New-PesterContainer -Path *.tests.ps1
+              $container = New-PesterContainer -Path "*.tests.ps1"
               #  -Tag @("Bicep") -ContainerName "Bicep"
 
               $config = New-PesterConfiguration
