@@ -100,7 +100,7 @@ stages:
 
 
           - task: AzureCLI@2
-            displayName: Running Pester tests
+            displayName: Run Pester tests
             inputs:
               azureSubscription: ServicePrincipal
               scriptType: 'pscore'
@@ -120,6 +120,14 @@ stages:
 
                 Invoke-Pester -Configuration $config
 
+          - task: PublishTestResults@2
+            inputs:
+              testRunner: "NUnit"
+              testResultsFiles: "$(build.artifactstagingdirectory)/**/testResults.xml"
+              testRunTitle: "PS_Win2016_Unit"
+              failTaskOnFailedTests: true
+            displayName: "Publish Unit Test Results"
+            condition: in(variables['Agent.JobStatus'], 'Succeeded', 'SucceededWithIssues', 'Failed')
 
           - task: AzureCLI@2
             displayName: Deploy bicep modules to ACR
