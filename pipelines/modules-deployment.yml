@@ -32,7 +32,7 @@ stages:
               Write-Host "Latest tag: $lastTag"
               Write-Host "Branch: $(Build.SourceBranch)"
 
-              $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
+              $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/").Replace("refs/pull/$(System.PullRequest.PullRequestId)/", "origin/")
 
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
