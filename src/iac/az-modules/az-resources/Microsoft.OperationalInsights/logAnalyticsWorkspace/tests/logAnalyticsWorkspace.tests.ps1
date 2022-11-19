@@ -16,7 +16,7 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
 
         It "Deployment must be sucessfull" {
 
-            $tags = "{'PesterRun':'true','Cost Center':'2345-324'}"
+            $tags = "{'PesterRun':'true','Cost Center':'2345-324','PesterRunId':'$($Context.RunId)'}"
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
                 --template-file $Context.Template `
