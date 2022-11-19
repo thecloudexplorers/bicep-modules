@@ -56,3 +56,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+.vscode/launch.json
+.vscode/settings.json
+.vscode/settings.json

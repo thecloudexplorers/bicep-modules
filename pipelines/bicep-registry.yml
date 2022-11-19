@@ -24,6 +24,10 @@ parameters:
     type: string
     default: dev
 
+pr: none
+
+trigger: none
+
 pool:
   vmImage: windows-latest
 
