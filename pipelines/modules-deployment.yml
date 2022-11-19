@@ -25,13 +25,11 @@ stages:
           - powershell: |
               if("$(Build.Reason)" -eq "PullRequest")
               {
-                $sourceBranch = "$(System.PullRequest.SourceBranch)"
-                $branch = "origin/$sourceBranch"
+                $sourceBranch = "origin/$(System.PullRequest.SourceBranch)"
               }
               else
               {
                 $sourceBranch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
-                $branch = $sourceBranch
               }
 
               Write-Host "##vso[task.setvariable variable=sourceBranch]$sourceBranch"
