@@ -99,26 +99,26 @@ stages:
             enabled: true
 
 
-        - task: AzureCLI@2
-          displayName: Running Pester tests
-          inputs:
-            azureSubscription: ServicePrincipal
-            scriptType: 'pscore'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              $container = New-PesterContainer -Path "*.tests.ps1"
-              #  -Tag @("Bicep") -ContainerName "Bicep"
+          - task: AzureCLI@2
+            displayName: Running Pester tests
+            inputs:
+              azureSubscription: ServicePrincipal
+              scriptType: 'pscore'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                $container = New-PesterContainer -Path "*.tests.ps1"
+                #  -Tag @("Bicep") -ContainerName "Bicep"
 
-              $config = New-PesterConfiguration
-              $config.TestResult.Enabled = $true
-              $config.TestResult.OutputFormat = "NUnitXML"
+                $config = New-PesterConfiguration
+                $config.TestResult.Enabled = $true
+                $config.TestResult.OutputFormat = "NUnitXML"
 
-              $config.TestResult.OutputPath = Join-Path "$(build.artifactstagingdirectory)" -ChildPath "testResults.xml"
+                $config.TestResult.OutputPath = Join-Path "$(build.artifactstagingdirectory)" -ChildPath "testResults.xml"
 
-              $config.Run.Container = $container
-              $config.Output.Verbosity = "Detailed"
+                $config.Run.Container = $container
+                $config.Output.Verbosity = "Detailed"
 
-              Invoke-Pester -Configuration $config
+                Invoke-Pester -Configuration $config
 
 
           - task: AzureCLI@2
