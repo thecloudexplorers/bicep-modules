@@ -29,7 +29,7 @@ stages:
 
               $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
 
-              if($(Build.Resonse.Reason) -eq "PullRequest")
+              if("$(Build.Reason)" -eq "PullRequest")
               {
                 $sourceBranch = "$(System.PullRequest.SourceBranch)"
               }
