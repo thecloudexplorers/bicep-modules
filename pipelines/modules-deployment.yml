@@ -32,16 +32,16 @@ stages:
               if("$(Build.Reason)" -eq "PullRequest")
               {
                 $sourceBranch = "$(System.PullRequest.SourceBranch)"
+                $branch = "origin/$sourceBranch"
               }
               else
               {
-                $sourceBranch = "$(Build.SourceBranch)"
+                $sourceBranch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
+                $branch = $sourceBranch
               }
 
               Write-Host "Latest tag: $lastTag"
-              Write-Host "Branch: $sourceBranch"
-
-              $branch = $sourceBranch.Replace("refs/heads/", "origin/")
+              Write-Host "Branch: $branch"
 
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 

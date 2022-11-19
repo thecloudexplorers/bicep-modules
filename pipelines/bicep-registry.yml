@@ -26,6 +26,8 @@ parameters:
 
 pr: none
 
+trigger: none
+
 pool:
   vmImage: windows-latest
 
