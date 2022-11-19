@@ -29,10 +29,19 @@ stages:
 
               $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
 
-              Write-Host "Latest tag: $lastTag"
-              Write-Host "Branch: $(Build.SourceBranch)"
+              if($(Build.Resonse.Reason) -eq "PullRequest")
+              {
+                $sourceBranch = "$(System.PullRequest.SourceBranch)"
+              }
+              else
+              {
+                $sourceBranch = "$(Build.SourceBranch)"
+              }
 
-              $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/").Replace("refs/pull/$(System.PullRequest.PullRequestId)/", "origin/")
+              Write-Host "Latest tag: $lastTag"
+              Write-Host "Branch: $sourceBranch"
+
+              $branch = $sourceBranch.Replace("refs/heads/", "origin/")
 
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
