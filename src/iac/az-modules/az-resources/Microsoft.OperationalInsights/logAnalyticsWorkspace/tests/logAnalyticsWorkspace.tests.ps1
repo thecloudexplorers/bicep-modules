@@ -20,12 +20,13 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
                 --template-file $Context.Template `
+                --name pesterRun-$Context.RunId `
                 --parameters `
-                    name="log-pesterrun" `
-                    location="westeurope" `
-                    sku="PerGB2018" `
-                    tags=$tags `
-                | ConvertFrom-Json
+                name="log-pesterrun-$($Context.RunId)" `
+                location="westeurope" `
+                sku="PerGB2018" `
+                tags=$tags `
+            | ConvertFrom-Json
 
             $deploymentState = $deployment.properties.provisioningState
 
@@ -40,4 +41,10 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
             $logAnalytics | Should -Not -Be $null
         }
     }
+}
+
+AfterAll {
+    # Remove the resource created with the tag PesterRunId
+    Write-Host "Removing resources created by Pester"
+    az resource list --tag PesterRunId=1879
 }
