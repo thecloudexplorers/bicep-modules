@@ -101,6 +101,7 @@ stages:
           - task: AzureCLI@2
             displayName: Deploy bicep modules to ACR
             enabled: true
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
@@ -129,6 +130,7 @@ stages:
               git push --tags
             workingDirectory: $(Build.SourcesDirectory)
             displayName: "Generate git tag"
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
             enabled: true
 
           - powershell: |
