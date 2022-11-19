@@ -35,7 +35,7 @@ stages:
               }
 
               Write-Host "##vso[task.setvariable variable=sourceBranch]$sourceBranch"
-              Write-Host "Branch: $(sourceBranch)"
+              Write-Host "Branch: $sourceBranch"
 
             displayName: Determine source branch
 
