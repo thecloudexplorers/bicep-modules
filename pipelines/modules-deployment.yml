@@ -24,15 +24,26 @@ stages:
 
           - powershell: |
               Write-Host "Validate version file"
-              git tag --sort=-committerdate -l
 
+
+              # if( $(Build.Reason) -eq "PullRequest")
+              # {
+              #   $sourceBranch = $(System.PullRequest.SourceBranch)
+              # }
+              # else{
+                $sourceBranch = $(Build.SourceBranch)
+              # }
+
+              git fetch --all --tags
+
+              git tag --sort=-committerdate -l
 
               $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
 
               Write-Host "Latest tag: $lastTag"
-              Write-Host "Branch: $(Build.SourceBranch)"
+              Write-Host "Branch: $sourceBranch"
 
-              $branch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
+              $branch = "$sourceBranch".Replace("refs/heads/", "origin/")
 
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
