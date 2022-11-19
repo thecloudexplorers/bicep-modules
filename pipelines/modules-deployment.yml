@@ -118,6 +118,10 @@ stages:
                 $config.Run.Container = $container
                 $config.Output.Verbosity = "Detailed"
 
+                $tags = @("azcli", "bicep")
+
+                $config.Filter.Tag = $tags
+
                 Invoke-Pester -Configuration $config
 
           - task: PublishTestResults@2

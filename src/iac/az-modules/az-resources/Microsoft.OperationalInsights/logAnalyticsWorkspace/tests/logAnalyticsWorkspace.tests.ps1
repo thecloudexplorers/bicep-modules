@@ -11,7 +11,7 @@ BeforeAll {
     }
 }
 
-Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace {
+Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
     Context "Validate Log Analytics Workspace" {
 
         It "Deployment must be sucessfull" -Skip {
