@@ -3,10 +3,7 @@ BeforeAll {
     # TODO: Load modules
 
     $Context = @{
-        # WorkloadAffix    = "wl"
-        # ApplicationSufix = "pst"
-        # Environment      = "exp"
-        Template      = "../main.bicep"
+        Template      = "src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep"
         ResourceGroup = "rg-bicepmodules"
     }
 }
@@ -15,11 +12,7 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
     Context "Validate Log Analytics Workspace" {
 
         It "Deployment must be sucessfull" {
-            # $deployment = New-AzDeployment  -Location westeurope `
-            #     -TemplateFile $Context.Template `
-            #     -workloadAffix $Context.WorkloadAffix `
-            #     -applicationSufix $Context.ApplicationSufix `
-            #     -environment $Context.Environment
+
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
                 --template-file $Context.Template | ConvertFrom-Json

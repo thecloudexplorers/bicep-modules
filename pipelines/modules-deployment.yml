@@ -105,6 +105,7 @@ stages:
               azureSubscription: ServicePrincipal
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
+              workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 $container = New-PesterContainer -Path "*.tests.ps1"
                 #  -Tag @("Bicep") -ContainerName "Bicep"
