@@ -14,7 +14,7 @@ BeforeAll {
 Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
     Context "Validate Log Analytics Workspace" {
 
-        It "Deployment must be sucessfull" -Skip {
+        It "Deployment must be sucessfull" {
             # $deployment = New-AzDeployment  -Location westeurope `
             #     -TemplateFile $Context.Template `
             #     -workloadAffix $Context.WorkloadAffix `
