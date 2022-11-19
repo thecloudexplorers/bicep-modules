@@ -23,12 +23,6 @@ stages:
             fetchDepth: 0
 
           - powershell: |
-              Write-Host "Validate version file"
-
-              git fetch --all --tags
-
-              $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
-
               if("$(Build.Reason)" -eq "PullRequest")
               {
                 $sourceBranch = "$(System.PullRequest.SourceBranch)"
@@ -40,8 +34,34 @@ stages:
                 $branch = $sourceBranch
               }
 
+              Write-Host "##vso[task.setvariable variable=sourceBranch]$sourceBranch"
+              Write-Host "Branch: $(sourceBranch)"
+
+            displayName: Determine source branch
+
+          - powershell: |
+              Write-Host "Validate version file"
+
+              git fetch --all --tags
+
+              $lastTag = git tag --sort=-committerdate -l | Where {$_ -notlike "*pre-release*"  } | Select -First 1
+
+              # if("$(Build.Reason)" -eq "PullRequest")
+              # {
+              #   $sourceBranch = "$(System.PullRequest.SourceBranch)"
+              #   $branch = "origin/$sourceBranch"
+              # }
+              # else
+              # {
+              #   $sourceBranch = "$(Build.SourceBranch)".Replace("refs/heads/", "origin/")
+              #   $branch = $sourceBranch
+              # }
+
+              # Write-Host "Branch: $branch"
+
+              $branch = "$(sourceBranch)"
+
               Write-Host "Latest tag: $lastTag"
-              Write-Host "Branch: $branch"
 
               $versionFile = (git diff --name-only $lastTag $branch) -match "/version.json"
 
