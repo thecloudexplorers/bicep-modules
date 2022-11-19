@@ -15,17 +15,17 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
     Context "Validate Log Analytics Workspace" {
 
         It "Deployment must be sucessfull" {
-
+            $runId = $Context.RunId
             $tags = "{'PesterRun':'true','Cost Center':'2345-324','PesterRunId':'$($Context.RunId)'}"
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
                 --template-file $Context.Template `
                 --name pesterRun-$Context.RunId `
                 --parameters `
-                name="log-pesterrun-$($Context.RunId)" `
-                location="westeurope" `
-                sku="PerGB2018" `
-                tags=$tags `
+                    name="log-pesterrun-$runId" `
+                    location="westeurope" `
+                    sku="PerGB2018" `
+                    tags=$tags `
             | ConvertFrom-Json
 
             $deploymentState = $deployment.properties.provisioningState
