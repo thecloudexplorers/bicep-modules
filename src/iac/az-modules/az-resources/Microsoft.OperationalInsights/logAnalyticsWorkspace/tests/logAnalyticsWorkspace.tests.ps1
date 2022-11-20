@@ -46,6 +46,12 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
 AfterAll {
     # Remove the resource created with the tag PesterRunId
     Write-Host "Removing resources created by Pester"
-    $resourceId = (az resource list --tag PesterRunId=$Context.RunId --query "[].id" -o tsv)
-    Write-Host $resourceId #| ForEach-Object { az resource delete --ids $_ }
+    az resource list `
+        --tag PesterRunId=$Context.RunId `
+        --query "[].id" `
+        -o tsv | ForEach-Object {
+        Write-Host "Removing $($_)"
+        # az resource delete `
+        # --ids $_
+    }
 }
