@@ -66,7 +66,7 @@ AfterAll {
         # If ($IsDryRun) {
         #     az group exists -n "$_"
         # } Else {
-            # az resource delete -n "$_" -y
+        az resource delete -n "$_" -y
         # }
     }
 
