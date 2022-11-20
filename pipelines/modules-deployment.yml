@@ -106,7 +106,7 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                $container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = $(Build.SourcesDirectory) }
+                $container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = "$(Build.SourcesDirectory)" }
                 #  -Tag @("Bicep") -ContainerName "Bicep"
 
                 $config = New-PesterConfiguration
