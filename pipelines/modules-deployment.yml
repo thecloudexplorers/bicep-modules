@@ -106,6 +106,7 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
+                # TODO: Improve filter for only changed files directory
                 $container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = "$(Build.SourcesDirectory)" }
                 #  -Tag @("Bicep") -ContainerName "Bicep"
 

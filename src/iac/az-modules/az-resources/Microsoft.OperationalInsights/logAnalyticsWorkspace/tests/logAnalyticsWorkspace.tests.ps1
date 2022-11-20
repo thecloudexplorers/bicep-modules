@@ -63,19 +63,6 @@ AfterAll {
         -o tsv `
     | ForEach-Object {
         Write-Host "Removing resource $_"
-        # If ($IsDryRun) {
-        #     az group exists -n "$_"
-        # } Else {
         az resource delete -n "$_" -g $Context.ResourceGroup --resource-type "Microsoft.OperationalInsights/workspaces"
-        # }
     }
-
-    # az resource list `
-    #     --tag PesterRunId=$Context.RunId `
-    #     --query "[].id" `
-    #     -o tsv | ForEach-Object {
-    #     Write-Host "Removing $($_)"
-    #     az resource delete `
-    #         --ids $_
-    # }
 }
