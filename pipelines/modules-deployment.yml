@@ -98,16 +98,15 @@ stages:
             displayName: Validate changed files
             enabled: true
 
-
           - task: AzureCLI@2
             displayName: Run Pester tests
             inputs:
               azureSubscription: ServicePrincipal
-              scriptType: 'pscore'
-              scriptLocation: 'inlineScript'
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                $container = New-PesterContainer -Path "*.tests.ps1"
+                $container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = $(Build.SourcesDirectory) }
                 #  -Tag @("Bicep") -ContainerName "Bicep"
 
                 $config = New-PesterConfiguration
