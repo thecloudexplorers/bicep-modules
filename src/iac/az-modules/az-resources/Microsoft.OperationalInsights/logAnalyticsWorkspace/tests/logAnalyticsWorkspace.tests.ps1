@@ -20,7 +20,7 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
                 --template-file $Context.Template `
-                --name pesterRun-$Context.RunId `
+                --name "pesterRun-$runId" `
                 --parameters `
                     name="log-pesterrun-$runId" `
                     location="westeurope" `
