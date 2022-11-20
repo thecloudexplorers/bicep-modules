@@ -15,7 +15,7 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
     Context "Validate Log Analytics Workspace" {
 
         It "Deployment must be sucessfull" {
-            $runId = $Context.RunId
+            $runId = $Context.RunId | Out-String -Stream
             $tags = "{'PesterRun':'true','Cost Center':'2345-324','PesterRunId':'$($Context.RunId)'}"
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
