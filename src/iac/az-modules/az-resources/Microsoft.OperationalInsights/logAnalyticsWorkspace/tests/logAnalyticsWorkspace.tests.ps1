@@ -1,10 +1,13 @@
+param($workingDir)
+
 BeforeAll {
 
     # TODO: Load modules
 
     $Context = @{
         # TODO: Parametrize for local testing
-        Template      = "src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep"
+
+        Template      = "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep"
         ResourceGroup = "rg-bicepmodules"
         # Randon id to avoid collisions
         RunId         = (Get-Random -Minimum 1000 -Maximum 9999)
@@ -22,10 +25,10 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
                 --template-file $Context.Template `
                 --name "pesterRun-$runId" `
                 --parameters `
-                    name="log-pesterrun-$runId" `
-                    location="westeurope" `
-                    sku="PerGB2018" `
-                    tags=$tags `
+                name="log-pesterrun-$runId" `
+                location="westeurope" `
+                sku="PerGB2018" `
+                tags=$tags `
             | ConvertFrom-Json
 
             $deploymentState = $deployment.properties.provisioningState
@@ -55,15 +58,15 @@ AfterAll {
 
     $tagsParam = $tagsParam.Trim()
 
-    az group list `
+    az resource list `
         --query "[?$tagsParam].[name]" `
         -o tsv `
     | ForEach-Object {
-        Write-Host "Removing resource group $_"
+        Write-Host "Removing resource $_"
         # If ($IsDryRun) {
         #     az group exists -n "$_"
         # } Else {
-            az group delete -n "$_" -y
+            # az resource delete -n "$_" -y
         # }
     }
 
