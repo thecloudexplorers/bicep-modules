@@ -51,7 +51,7 @@ AfterAll {
         --query "[].id" `
         -o tsv | ForEach-Object {
         Write-Host "Removing $($_)"
-        # az resource delete `
-        # --ids $_
+        az resource delete `
+            --ids $_
     }
 }
