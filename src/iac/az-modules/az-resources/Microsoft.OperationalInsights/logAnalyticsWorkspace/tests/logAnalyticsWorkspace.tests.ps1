@@ -63,7 +63,7 @@ AfterAll {
         # If ($IsDryRun) {
         #     az group exists -n "$_"
         # } Else {
-        #     az group delete -n "$_" -y
+            az group delete -n "$_" -y
         # }
     }
 
