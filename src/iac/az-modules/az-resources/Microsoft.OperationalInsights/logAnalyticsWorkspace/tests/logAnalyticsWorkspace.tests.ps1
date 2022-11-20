@@ -46,12 +46,33 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
 AfterAll {
     # Remove the resource created with the tag PesterRunId
     Write-Host "Removing resources created by Pester"
-    az resource list `
-        --tag PesterRunId=$Context.RunId `
-        --query "[].id" `
-        -o tsv | ForEach-Object {
-        Write-Host "Removing $($_)"
-        az resource delete `
-            --ids $_
+    $tags = @{
+        PesterRun   = "true"
+        PesterRunId = $Context.RunId
     }
+
+    $tagsParam = ($Tags.GetEnumerator() | ForEach-Object { "tags.$($_.Key) == '$($_.Value)'" }) -join ' && '
+
+    $tagsParam = $tagsParam.Trim()
+
+    az group list `
+        --query "[?$tagsParam].[name]" `
+        -o tsv `
+    | ForEach-Object {
+        Write-Host "Removing resource group $_"
+        # If ($IsDryRun) {
+        #     az group exists -n "$_"
+        # } Else {
+        #     az group delete -n "$_" -y
+        # }
+    }
+
+    # az resource list `
+    #     --tag PesterRunId=$Context.RunId `
+    #     --query "[].id" `
+    #     -o tsv | ForEach-Object {
+    #     Write-Host "Removing $($_)"
+    #     az resource delete `
+    #         --ids $_
+    # }
 }
