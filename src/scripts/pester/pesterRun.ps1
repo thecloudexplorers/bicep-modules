@@ -18,7 +18,7 @@ $config.Output.Verbosity = "Detailed"
 
 $tags = @("deployment", "azcli", "bicep")
 
-if ($ModuleName) {
+if ($ModuleName -ne "all") {
     $tags += $ModuleName
 }
 

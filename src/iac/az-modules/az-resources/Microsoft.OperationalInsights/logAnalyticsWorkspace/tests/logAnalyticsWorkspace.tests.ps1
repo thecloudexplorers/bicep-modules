@@ -17,11 +17,8 @@ BeforeAll {
     }
 
     $Context = @{
-        RunId         = $RunId
-        PesterRunId   = "pesterrun-$RunId"
-
-        Template      = "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep"
-        ParameterFile = "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/tests/main.parameters.json"
+        # RunId         = $RunId
+        # PesterRunId   = "pesterrun-$RunId"
 
         ResourceGroup = "rg-bicepmodules-$RunId"
         ResourceName  = "log-pesterrun-$RunId"
@@ -37,45 +34,24 @@ BeforeAll {
     az deployment sub create `
         --location $Context.Location `
         --template-file "$workingDir/src/iac/az-modules/az-resources/Microsoft.Resources/resourcegroup/main.bicep" `
-        --name $Context.PesterRunId `
+        --name "pesterrun-$RunId" `
         --parameters `
         name=$resourceGroup `
         tags=$tags
-}
 
-Describe "Deployment" -Tag deployment, bicep, azcli {
-    Context "Validate Bicep deployment on Azure" {
+    # Execute bicep deploy
+    Write-Host "##[command]Executing bicep deployment - Scope '$($Context.ResourceName)'..."
+    $resourceName = $Context.ResourceName | Out-String -Stream
+    $tags = ($Tags | ConvertTo-Json -Compress).Replace('"', "'")
 
-        It "Deployment must be sucessfull" {
-            $resourceName = $Context.ResourceName | Out-String -Stream
-            $tags = ($Context.Tags | ConvertTo-Json -Compress).Replace('"', "'")
-
-            Write-Host "##[command]Executing bicep deployment - Scope '$($Context.ResourceName)'..."
-            $deployment = az deployment group create `
-                --resource-group $Context.ResourceGroup `
-                --template-file $Context.Template `
-                --name $Context.PesterRunId `
-                --parameters $Context.ParameterFile `
-                --parameters `
-                name=$resourceName `
-                tags=$tags `
-            | ConvertFrom-Json
-
-            $deploymentState = $deployment.properties.provisioningState
-
-            $deploymentState | Should -Be "Succeeded"
-        }
-
-        It "Resource must be created" {
-            $resourceName = $Context.ResourceName | Out-String -Stream
-            $resource = az resource list `
-                --resource-group $Context.ResourceGroup `
-                --query "[?name=='$resourceName']" `
-            | ConvertFrom-Json
-
-            $resource.name | Should -Not -Be $null
-        }
-    }
+    az deployment group create `
+        --resource-group $Context.ResourceGroup `
+        --template-file "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep" `
+        --name "pesterrun-$RunId" `
+        --parameters "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/tests/main.parameters.json" `
+        --parameters `
+        name=$resourceName `
+        tags=$tags
 }
 
 Describe "Log Analytics Workspace" -Tag loganalyticsworkspace, bicep, azcli {
@@ -120,8 +96,8 @@ Describe "Log Analytics Workspace" -Tag loganalyticsworkspace, bicep, azcli {
 }
 
 AfterAll {
-    # Remove the resource created with the tag PesterRunId
-    Write-Host "##[command]Removing resource group '$($Context.ResourceGroup)' created by Pester..."
+    # Remove the resource created during the test
+    Write-Host "##[command]Removing resource group '$($Context.ResourceGroup)'..."
 
     az group delete -n $Context.ResourceGroup -y
 }
