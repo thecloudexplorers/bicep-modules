@@ -178,8 +178,8 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                $acrName = $(acrId)
-                $bicepModuleName = $(bicepModuleName)
+                $acrName = "$(acrId)"
+                $bicepModuleName = "$(bicepModuleName)"
 
                 List acr tags with pre-release
                 $preReleases = az acr repository show-tags `
@@ -205,10 +205,10 @@ stages:
                 | Where-Object { $_.tags.count -eq 0 }
 
                 # Remove manifest for images without tags
-                foreach ($manifest in $manifests) {
-                    Write-Host "Removing manifest: $($manifest.digest)"
-                    az acr repository delete `
-                        --name $acrName `
-                        --image "bicep/modules/$bicepModuleName`@$($manifest.digest)" `
-                        --yes
-                }
+                # foreach ($manifest in $manifests) {
+                #     Write-Host "Removing manifest: $($manifest.digest)"
+                #     az acr repository delete `
+                #         --name $acrName `
+                #         --image "bicep/modules/$bicepModuleName`@$($manifest.digest)" `
+                #         --yes
+                # }
