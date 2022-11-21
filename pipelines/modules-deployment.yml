@@ -100,6 +100,7 @@ stages:
 
           - task: AzureCLI@2
             displayName: Run Pester tests
+            enabled: false
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
@@ -167,56 +168,47 @@ stages:
             displayName: "Remove git pre releases"
             condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
-          # - task: AzureCLI@2
-          #   displayName: Remove acr pre releases
-          #   enabled: true
-          #   # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-          #   inputs:
-          #     azureSubscription: "ServicePrincipal"
-          #     scriptType: "pscore"
-          #     scriptLocation: "inlineScript"
-          #     workingDirectory: $(Build.SourcesDirectory)
-          #     inlineScript: |
-          #       # List acr tags with pre-release
-          #       $preReleases = az acr repository show-tags `
-          #         --name $(acrId) `
-          #         --repository bicep/modules/$env:bicepModuleName `
-          #         --query "[?ends_with(@, '117-pre-release')]" `
-          #         --output json | ConvertFrom-Json
+          - task: AzureCLI@2
+            displayName: Remove acr pre releases
+            enabled: true
+            # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                $acrName = $(acrId)
+                $bicepModuleName = $(bicepModuleName)
 
-          #       # Delete image if sha is unique otherwise untag
-          #       foreach($preRelease in $preReleases){
-          #         $image = az acr repository show-manifests `
-          #           --name $(acrId) `
-          #           --repository bicep/modules/$env:bicepModuleName `
-          #           --query "[?tags[0] == '$preRelease']" `
-          #           --output json | ConvertFrom-Json
+                List acr tags with pre-release
+                $preReleases = az acr repository show-tags `
+                    --name $acrName `
+                    --repository bicep/modules/$bicepModuleName `
+                    --query "[?ends_with(@, '120-pre-release')]" `
+                    --output json | ConvertFrom-Json
 
-          #         if($image.Count -eq 1){
-          #           Write-Host "Removing image: $preRelease"
-          #           az acr repository delete `
-          #             --name $(acrId) `
-          #             --image bicep/modules/$env:bicepModuleName:$preRelease `
-          #             --yes
-          #         }else{
-          #           Write-Host "Untagging image: $preRelease"
-          #           az acr repository untag `
-          #             --name $(acrId) `
-          #             --image bicep/modules/$env:bicepModuleName:$preRelease `
-          #             --yes
-          #         }
-          #       }
+                # # Untag all pre-release tags
+                foreach ($preRelease in $preReleases) {
+                    Write-Host "Untagging image: $preRelease"
+                    az acr repository untag `
+                        --name $acrName `
+                        --image "bicep/modules/$bicepModuleName`:$preRelease"
+                }
 
-          #       foreach($preRelease in $preReleases){
-          #         Write-Host "Removing pre release version: $preRelease"
-          #         az acr repository delete `
-          #           --name $(acrId) `
-          #           --image bicep/modules/$env:bicepModuleName:$preRelease `
-          #           --yes
-          #       }
+                # Get manifest for images without tags
+                $manifests = az acr repository show-manifests `
+                    --name $acrName `
+                    --repository bicep/modules/$bicepModuleName `
+                    --output json `
+                | ConvertFrom-Json -Depth 10 `
+                | Where-Object { $_.tags.count -eq 0 }
 
-          #       # $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
-          #       # $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
-
-          #       # Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
-          #       # az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
+                # Remove manifest for images without tags
+                foreach ($manifest in $manifests) {
+                    Write-Host "Removing manifest: $($manifest.digest)"
+                    az acr repository delete `
+                        --name $acrName `
+                        --image "bicep/modules/$bicepModuleName`@$($manifest.digest)" `
+                        --yes
+                }

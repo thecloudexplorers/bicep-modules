@@ -1,7 +1,7 @@
 @minLength(5)
 @maxLength(50)
 @description('Provide a globally unique name of your Azure Log Analytics Workspace')
-param name string = 'log-${uniqueString(resourceGroup().id)}'
+param name string = 'log${uniqueString(resourceGroup().id)}'
 
 @description('Provide a location.')
 param location string = resourceGroup().location
