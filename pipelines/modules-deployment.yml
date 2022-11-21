@@ -181,7 +181,7 @@ stages:
                 $acrName = "$(acrId)"
                 $bicepModuleName = "$(bicepModuleName)"
 
-                List acr tags with pre-release
+                # List acr tags with pre-release
                 $preReleases = az acr repository show-tags `
                     --name $acrName `
                     --repository bicep/modules/$bicepModuleName `
