@@ -17,9 +17,6 @@ BeforeAll {
     }
 
     $Context = @{
-        # RunId         = $RunId
-        # PesterRunId   = "pesterrun-$RunId"
-
         ResourceGroup = "rg-bicepmodules-$RunId"
         ResourceName  = "log-pesterrun-$RunId"
         Location      = "westeurope"
@@ -42,7 +39,7 @@ BeforeAll {
     # Execute bicep deploy
     Write-Host "##[command]Executing bicep deployment - Scope '$($Context.ResourceName)'..."
     $resourceName = $Context.ResourceName | Out-String -Stream
-    $tags = ($Tags | ConvertTo-Json -Compress).Replace('"', "'")
+    $tags = ($Context.Tags | ConvertTo-Json -Compress).Replace('"', "'")
 
     az deployment group create `
         --resource-group $Context.ResourceGroup `
