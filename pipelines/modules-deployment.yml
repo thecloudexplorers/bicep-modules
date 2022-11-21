@@ -104,7 +104,7 @@ stages:
               azureSubscription: 'ServicePrincipal'
               scriptType: 'pscore'
               scriptLocation: 'scriptPath'
-              scriptPath: '/src/scripts/pester/pesterRun.ps1'
+              scriptPath: '$(Build.SourcesDirectory)/src/scripts/pester/pesterRun.ps1'
               arguments: '-WorkingDirectory $(Build.SourcesDirectory) -ModuleName $(bicepModuleName)'
               workingDirectory: '$(Build.SourcesDirectory)'
 
