@@ -17,16 +17,30 @@ BeforeAll {
     }
 
     $Context = @{
+        RunId         = $RunId
         PesterRunId   = "pesterrun-$RunId"
 
         Template      = "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/main.bicep"
         ParameterFile = "$workingDir/src/iac/az-modules/az-resources/Microsoft.OperationalInsights/logAnalyticsWorkspace/tests/main.parameters.json"
 
-        ResourceGroup = "rg-bicepmodules"
+        ResourceGroup = "rg-bicepmodules-$RunId"
         ResourceName  = "log-pesterrun-$RunId"
         Location      = "westeurope"
         Tags          = $Tags
     }
+
+    # Create resource group to run tests in
+    Write-Host "##[command]Creating resource group $($Context.ResourceGroup)..."
+    $tags = ($Context.Tags | ConvertTo-Json -Compress).Replace('"', "'")
+    $resourceGroup = ($Context.ResourceGroup | ConvertTo-Json -Compress)
+
+    az deployment sub create `
+        --location $Context.Location `
+        --template-file "$workingDir/src/iac/az-modules/az-resources/Microsoft.Resources/resourcegroup/main.bicep" `
+        --name $Context.PesterRunId `
+        --parameters `
+        name=$resourceGroup `
+        tags=$tags
 }
 
 Describe "Deployment" -Tag deployment, bicep, azcli {
@@ -36,6 +50,7 @@ Describe "Deployment" -Tag deployment, bicep, azcli {
             $resourceName = $Context.ResourceName | Out-String -Stream
             $tags = ($Context.Tags | ConvertTo-Json -Compress).Replace('"', "'")
 
+            Write-Host "##[command]Executing bicep deployment - Scope '$($Context.ResourceName)'..."
             $deployment = az deployment group create `
                 --resource-group $Context.ResourceGroup `
                 --template-file $Context.Template `
@@ -53,7 +68,6 @@ Describe "Deployment" -Tag deployment, bicep, azcli {
 
         It "Resource must be created" {
             $resourceName = $Context.ResourceName | Out-String -Stream
-            $runId = $Context.RunId | Out-String -Stream
             $resource = az resource list `
                 --resource-group $Context.ResourceGroup `
                 --query "[?name=='$resourceName']" `
@@ -108,20 +122,15 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
 AfterAll {
     # Remove the resource created with the tag PesterRunId
     Write-Host "Removing resources created by Pester"
-    $tags = @{
-        PesterRun   = "true"
-        PesterRunId = $Context.RunId
-    }
 
-    $tagsParam = ($Tags.GetEnumerator() | ForEach-Object { "tags.$($_.Key) == '$($_.Value)'" }) -join ' && '
+    $tagsParam = ($Context.Tags.GetEnumerator() | ForEach-Object { "tags.$($_.Key) == '$($_.Value)'" }) -join ' && '
 
     $tagsParam = $tagsParam.Trim()
 
-    az resource list `
+    az group list `
         --query "[?$tagsParam].[name]" `
-        -o tsv `
-    | ForEach-Object {
-        Write-Host "Removing resource $_"
-        az resource delete -n "$_" -g $Context.ResourceGroup --resource-type "Microsoft.OperationalInsights/workspaces"
+        -o tsv | ForEach-Object {
+        Write-Host "removing rg $_"
+        az group delete -n "$_" -y
     }
 }
