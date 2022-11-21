@@ -123,14 +123,17 @@ AfterAll {
     # Remove the resource created with the tag PesterRunId
     Write-Host "Removing resources created by Pester"
 
-    $tagsParam = ($Context.Tags.GetEnumerator() | ForEach-Object { "tags.$($_.Key) == '$($_.Value)'" }) -join ' && '
+    $resourceGroup = $Context.ResourceGroup | Out-String -Stream
 
-    $tagsParam = $tagsParam.Trim()
+    az group delete -n $resourceGroup -y
 
-    az group list `
-        --query "[?$tagsParam].[name]" `
-        -o tsv | ForEach-Object {
-        Write-Host "removing rg $_"
-        az group delete -n "$_" -y
-    }
+    # $tagsParam = ($Context.Tags.GetEnumerator() | ForEach-Object { "tags.$($_.Key) == '$($_.Value)'" }) -join ' && '
+
+    # $tagsParam = $tagsParam.Trim()
+    # az group list `
+    #     --query "[?$tagsParam].[name]" `
+    #     -o tsv | ForEach-Object {
+    #     Write-Host "removing rg $_"
+    #     az group delete -n "$_" -y
+    # }
 }

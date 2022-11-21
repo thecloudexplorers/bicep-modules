@@ -78,7 +78,7 @@ stages:
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: "Get version"
+            displayName: "Get module information"
             enabled: true
 
           - powershell: |
@@ -95,7 +95,7 @@ stages:
                       Write-Error "Error: Identified changes in a module other than '$env:bicepModuleName'"
                   }
               }
-            displayName: Validate changed files
+            displayName: Validate uniqueness of changed modules
             enabled: true
 
           - task: AzureCLI@2
