@@ -78,7 +78,7 @@ Describe "Deployment" -Tag deployment, bicep, azcli {
     }
 }
 
-Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
+Describe "Log Analytics Workspace" -Tag loganalyticsworkspace, bicep, azcli {
     Context "Validate Log Analytics Workspace" {
 
         It "Log Analytics must no be null" {
@@ -121,19 +121,7 @@ Describe "Log Analytics Workspace" -Tag logAnalyticsWorkspace, bicep, azcli {
 
 AfterAll {
     # Remove the resource created with the tag PesterRunId
-    Write-Host "Removing resources created by Pester"
+    Write-Host "##[command]Removing resource group '$($Context.ResourceGroup)' created by Pester..."
 
-    $resourceGroup = $Context.ResourceGroup | Out-String -Stream
-
-    az group delete -n $resourceGroup -y
-
-    # $tagsParam = ($Context.Tags.GetEnumerator() | ForEach-Object { "tags.$($_.Key) == '$($_.Value)'" }) -join ' && '
-
-    # $tagsParam = $tagsParam.Trim()
-    # az group list `
-    #     --query "[?$tagsParam].[name]" `
-    #     -o tsv | ForEach-Object {
-    #     Write-Host "removing rg $_"
-    #     az group delete -n "$_" -y
-    # }
+    az group delete -n $Context.ResourceGroup -y
 }
