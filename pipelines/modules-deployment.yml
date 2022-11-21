@@ -101,12 +101,12 @@ stages:
           - task: AzureCLI@2
             displayName: Run Pester tests
             inputs:
-              azureSubscription: 'ServicePrincipal'
-              scriptType: 'pscore'
-              scriptLocation: 'scriptPath'
-              scriptPath: '$(Build.SourcesDirectory)/src/scripts/pester/pesterRun.ps1'
-              arguments: '-WorkingDirectory $(Build.SourcesDirectory) -ModuleName $(bicepModuleName)'
-              workingDirectory: '$(Build.SourcesDirectory)'
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "scriptPath"
+              scriptPath: "$(Build.SourcesDirectory)/src/scripts/pester/pesterRun.ps1"
+              arguments: "-WorkingDirectory $(Build.SourcesDirectory) -ModuleName $(bicepModuleName)"
+              workingDirectory: "$(Build.SourcesDirectory)"
 
           - task: PublishTestResults@2
             inputs:
@@ -164,5 +164,36 @@ stages:
                 git push --delete origin $preRelease
               }
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: "Remove pre releases"
+            displayName: "Remove git pre releases"
             condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
+          - task: AzureCLI@2
+            displayName: Remove acr pre releases
+            enabled: true
+            # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                # List acr tags with pre-release
+                $preReleases = az acr repository show-tags `
+                  --name $(acrId) `
+                  --repository bicep/modules/$env:bicepModuleName `
+                  --query "[?ends_with(@, '-pre-release')]" `
+                  --output json | ConvertFrom-Json
+
+                foreach($preRelease in $preReleases){
+                  Write-Host "Removing pre release version: $preRelease"
+                  az acr repository delete `
+                    --name $(acrId) `
+                    --image bicep/modules/$env:bicepModuleName:$preRelease `
+                    --yes
+                }
+
+                # $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
+                # $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
+
+                # Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
+                # az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
