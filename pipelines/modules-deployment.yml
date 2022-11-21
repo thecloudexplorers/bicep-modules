@@ -167,33 +167,56 @@ stages:
             displayName: "Remove git pre releases"
             condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
 
-          - task: AzureCLI@2
-            displayName: Remove acr pre releases
-            enabled: true
-            # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-            inputs:
-              azureSubscription: "ServicePrincipal"
-              scriptType: "pscore"
-              scriptLocation: "inlineScript"
-              workingDirectory: $(Build.SourcesDirectory)
-              inlineScript: |
-                # List acr tags with pre-release
-                $preReleases = az acr repository show-tags `
-                  --name $(acrId) `
-                  --repository bicep/modules/$env:bicepModuleName `
-                  --query "[?ends_with(@, '-pre-release')]" `
-                  --output json | ConvertFrom-Json
+          # - task: AzureCLI@2
+          #   displayName: Remove acr pre releases
+          #   enabled: true
+          #   # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+          #   inputs:
+          #     azureSubscription: "ServicePrincipal"
+          #     scriptType: "pscore"
+          #     scriptLocation: "inlineScript"
+          #     workingDirectory: $(Build.SourcesDirectory)
+          #     inlineScript: |
+          #       # List acr tags with pre-release
+          #       $preReleases = az acr repository show-tags `
+          #         --name $(acrId) `
+          #         --repository bicep/modules/$env:bicepModuleName `
+          #         --query "[?ends_with(@, '117-pre-release')]" `
+          #         --output json | ConvertFrom-Json
 
-                foreach($preRelease in $preReleases){
-                  Write-Host "Removing pre release version: $preRelease"
-                  az acr repository delete `
-                    --name $(acrId) `
-                    --image bicep/modules/$env:bicepModuleName:$preRelease `
-                    --yes
-                }
+          #       # Delete image if sha is unique otherwise untag
+          #       foreach($preRelease in $preReleases){
+          #         $image = az acr repository show-manifests `
+          #           --name $(acrId) `
+          #           --repository bicep/modules/$env:bicepModuleName `
+          #           --query "[?tags[0] == '$preRelease']" `
+          #           --output json | ConvertFrom-Json
 
-                # $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
-                # $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
+          #         if($image.Count -eq 1){
+          #           Write-Host "Removing image: $preRelease"
+          #           az acr repository delete `
+          #             --name $(acrId) `
+          #             --image bicep/modules/$env:bicepModuleName:$preRelease `
+          #             --yes
+          #         }else{
+          #           Write-Host "Untagging image: $preRelease"
+          #           az acr repository untag `
+          #             --name $(acrId) `
+          #             --image bicep/modules/$env:bicepModuleName:$preRelease `
+          #             --yes
+          #         }
+          #       }
 
-                # Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
-                # az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
+          #       foreach($preRelease in $preReleases){
+          #         Write-Host "Removing pre release version: $preRelease"
+          #         az acr repository delete `
+          #           --name $(acrId) `
+          #           --image bicep/modules/$env:bicepModuleName:$preRelease `
+          #           --yes
+          #       }
+
+          #       # $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
+          #       # $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
+
+          #       # Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
+          #       # az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
