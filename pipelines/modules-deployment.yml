@@ -181,14 +181,14 @@ stages:
                 $acrName = "$(acrId)"
                 $bicepModuleName = "$(bicepModuleName)"
 
-                # List acr tags with pre-release
+                Write-Host "##[section]List acr tags with pre-release"
                 $preReleases = az acr repository show-tags `
                     --name $acrName `
                     --repository bicep/modules/$bicepModuleName `
                     --query "[?ends_with(@, 'pre-release')]" `
                     --output json | ConvertFrom-Json
 
-                # # Untag all pre-release tags
+                Write-Host "##[section]Untag all pre-release tags"
                 foreach ($preRelease in $preReleases) {
                     Write-Host "Untagging image: $preRelease"
                     az acr repository untag `
@@ -196,7 +196,7 @@ stages:
                         --image "bicep/modules/$bicepModuleName`:$preRelease"
                 }
 
-                # Get manifest for images without tags
+                Write-Host "##[section]Get manifest for images without tags"
                 $manifests = az acr repository show-manifests `
                     --name $acrName `
                     --repository bicep/modules/$bicepModuleName `
@@ -204,11 +204,11 @@ stages:
                 | ConvertFrom-Json -Depth 10 `
                 | Where-Object { $_.tags.count -eq 0 }
 
-                # Remove manifest for images without tags
-                # foreach ($manifest in $manifests) {
-                #     Write-Host "Removing manifest: $($manifest.digest)"
-                #     az acr repository delete `
-                #         --name $acrName `
-                #         --image "bicep/modules/$bicepModuleName`@$($manifest.digest)" `
-                #         --yes
-                # }
+                Write-Host "##[section]Remove manifest for images without tags"
+                foreach ($manifest in $manifests) {
+                    Write-Host "Removing manifest: $($manifest.digest)"
+                    az acr repository delete `
+                        --name $acrName `
+                        --image "bicep/modules/$bicepModuleName`@$($manifest.digest)" `
+                        --yes
+                }
