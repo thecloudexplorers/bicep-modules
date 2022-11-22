@@ -130,8 +130,15 @@ stages:
                 $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
                 $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
 
-                Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
+                Write-Host "##[section]Pushing module '$acrVersion' to ACR '$(acrId)'"
                 az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
+
+                # if master branch create 'latest' tag
+                if("$(Build.SourceBranch)" -eq "refs/heads/master"){
+                  $acrLatest = "$(bicepModuleName):latest"
+                  Write-Host "##[section]Pushing module '$acrLatest' to ACR '$(acrId)'"
+                  az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrLatest"
+                }
 
           - powershell: |
               $tagVersion = "$env:bicepModuleName-v$env:bicepModuleVersion"
