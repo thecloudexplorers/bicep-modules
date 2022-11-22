@@ -185,7 +185,7 @@ stages:
                 $preReleases = az acr repository show-tags `
                     --name $acrName `
                     --repository bicep/modules/$bicepModuleName `
-                    --query "[?ends_with(@, '125-pre-release')]" `
+                    --query "[?ends_with(@, 'pre-release')]" `
                     --output json | ConvertFrom-Json
 
                 # # Untag all pre-release tags
