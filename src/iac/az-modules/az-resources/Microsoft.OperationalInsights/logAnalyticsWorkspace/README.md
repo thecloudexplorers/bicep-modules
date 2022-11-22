@@ -8,7 +8,7 @@ This module provision an Azure Log Analytics Workspace.
 | --------- | ------- |
 | Bicep CLI | 0.10.61 |
 
-## Example
+## Examples
 
 ### Reference module
 
