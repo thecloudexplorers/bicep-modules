@@ -100,7 +100,6 @@ stages:
 
           - task: AzureCLI@2
             displayName: Run Pester tests
-            enabled: false
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
@@ -171,7 +170,7 @@ stages:
           - task: AzureCLI@2
             displayName: Remove acr pre releases
             enabled: true
-            # condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
             inputs:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
