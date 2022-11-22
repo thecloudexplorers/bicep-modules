@@ -21,3 +21,5 @@ module logAnalyticsWorkspace 'br:dotcedevcr001.azurecr.io/bicep/modules/loganaly
     tags: tags
   }
 }
+
+output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.outputs.logAnalyticsWorkspaceId
