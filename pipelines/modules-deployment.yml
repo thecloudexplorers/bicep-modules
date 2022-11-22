@@ -181,12 +181,14 @@ stages:
                 $acrName = "$(acrId)"
                 $bicepModuleName = "$(bicepModuleName)"
 
-                Write-Host "##[section]List acr tags with pre-release"
+                Write-Host "##[section]Get acr pre-release tags"
                 $preReleases = az acr repository show-tags `
                     --name $acrName `
                     --repository bicep/modules/$bicepModuleName `
                     --query "[?ends_with(@, 'pre-release')]" `
                     --output json | ConvertFrom-Json
+
+                Write-Host "Pre-release tags:`n$preReleases"
 
                 Write-Host "##[section]Untag all pre-release tags"
                 foreach ($preRelease in $preReleases) {
@@ -203,6 +205,8 @@ stages:
                     --output json `
                 | ConvertFrom-Json -Depth 10 `
                 | Where-Object { $_.tags.count -eq 0 }
+
+                Write-Host "Manifests without tags:`n$manifests"
 
                 Write-Host "##[section]Remove manifest for images without tags"
                 foreach ($manifest in $manifests) {
