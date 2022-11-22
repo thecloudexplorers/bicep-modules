@@ -78,7 +78,7 @@ stages:
               Write-Host "##vso[task.setvariable variable=bicepModuleName]$($versionFile.module)"
 
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: "Get version"
+            displayName: "Get module information"
             enabled: true
 
           - powershell: |
@@ -95,8 +95,34 @@ stages:
                       Write-Error "Error: Identified changes in a module other than '$env:bicepModuleName'"
                   }
               }
-            displayName: Validate changed files
+            displayName: Validate uniqueness of changed modules
             enabled: true
+
+          - task: AzureCLI@2
+            displayName: Run Pester tests
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "scriptPath"
+              scriptPath: "$(Build.SourcesDirectory)/src/scripts/pester/pesterRun.ps1"
+              arguments: "-WorkingDirectory $(Build.SourcesDirectory) -ModuleName $(bicepModuleName)"
+              workingDirectory: "$(Build.SourcesDirectory)"
+
+          - task: CopyFiles@2
+            displayName: Copying test artifacts
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: '**/testResults.xml'
+              TargetFolder: '$(build.artifactstagingdirectory)'
+          
+          - task: PublishTestResults@2
+            inputs:
+              testRunner: "NUnit"
+              testResultsFiles: "$(build.artifactstagingdirectory)/**/testResults.xml"
+              testRunTitle: "PS_Win2016_Unit"
+              failTaskOnFailedTests: true
+            displayName: "Publish Unit Test Results"
+            condition: in(variables['Agent.JobStatus'], 'Succeeded', 'SucceededWithIssues', 'Failed')
 
           - task: AzureCLI@2
             displayName: Deploy bicep modules to ACR
@@ -111,8 +137,15 @@ stages:
                 $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
                 $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
 
-                Write-Host "Pushing module '$acrVersion' to ACR '$(acrId)'"
+                Write-Host "##[section]Pushing module '$acrVersion' to ACR '$(acrId)'"
                 az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrVersion"
+
+                # if master branch create 'latest' tag
+                if("$(Build.SourceBranch)" -eq "refs/heads/master"){
+                  $acrLatest = "$(bicepModuleName):latest"
+                  Write-Host "##[section]Pushing module '$acrLatest' to ACR '$(acrId)'"
+                  az bicep publish --file $bicepModule --target "br:$(acrId)/bicep/modules/$acrLatest"
+                }
 
           - powershell: |
               $tagVersion = "$env:bicepModuleName-v$env:bicepModuleVersion"
@@ -145,5 +178,54 @@ stages:
                 git push --delete origin $preRelease
               }
             workingDirectory: $(Build.SourcesDirectory)
-            displayName: "Remove pre releases"
+            displayName: "Remove git pre releases"
             condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
+          - task: AzureCLI@2
+            displayName: Remove acr pre releases
+            enabled: true
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+            inputs:
+              azureSubscription: "ServicePrincipal"
+              scriptType: "pscore"
+              scriptLocation: "inlineScript"
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                $acrName = "$(acrId)"
+                $bicepModuleName = "$(bicepModuleName)"
+
+                Write-Host "##[section]Get acr pre-release tags"
+                $preReleases = az acr repository show-tags `
+                    --name $acrName `
+                    --repository bicep/modules/$bicepModuleName `
+                    --query "[?ends_with(@, 'pre-release')]" `
+                    --output json | ConvertFrom-Json
+
+                Write-Host "Pre-release tags:`n$preReleases"
+
+                Write-Host "##[section]Untag all pre-release tags"
+                foreach ($preRelease in $preReleases) {
+                    Write-Host "Untagging image: $preRelease"
+                    az acr repository untag `
+                        --name $acrName `
+                        --image "bicep/modules/$bicepModuleName`:$preRelease"
+                }
+
+                Write-Host "##[section]Get manifest for images without tags"
+                $manifests = az acr repository show-manifests `
+                    --name $acrName `
+                    --repository bicep/modules/$bicepModuleName `
+                    --output json `
+                | ConvertFrom-Json -Depth 10 `
+                | Where-Object { $_.tags.count -eq 0 }
+
+                Write-Host "Manifests without tags:`n$manifests"
+
+                Write-Host "##[section]Remove manifest for images without tags"
+                foreach ($manifest in $manifests) {
+                    Write-Host "Removing manifest: $($manifest.digest)"
+                    az acr repository delete `
+                        --name $acrName `
+                        --image "bicep/modules/$bicepModuleName`@$($manifest.digest)" `
+                        --yes
+                }

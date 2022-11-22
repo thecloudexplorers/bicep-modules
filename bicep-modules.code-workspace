@@ -1,0 +1,51 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.defaultLanguage": "powershell",
+    "powershell.codeFormatting.preset": "OTBS",
+    "powershell.codeFormatting.alignPropertyValuePairs": true,
+    "powershell.codeFormatting.whitespaceInsideBrace": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
+    "powershell.codeFormatting.addWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.whitespaceAroundOperator": true,
+    "powershell.codeFormatting.whitespaceAfterSeparator": true,
+    "explorer.compactFolders": false,
+    "files.associations": {
+      "*.yml": "azure-pipelines"
+    },
+    "pester.autoRunOnSave": false
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run pester tests",
+        "type": "PowerShell",
+        "request": "launch",
+        "script": "${workspaceFolder}/src/scripts/pester/pesterRun.ps1",
+        "cwd": "${cwd}",
+        "args": [
+          "-WorkingDirectory",
+          "${workspaceFolder}",
+          // Specify bicep module name to reduce test scope
+          "-ModuleName",
+          "${input:bicepModuleName}"
+        ],
+      }
+    ],
+    "inputs": [
+      {
+        "id": "bicepModuleName",
+        "type": "promptString",
+        "description": "Bicep Module Name",
+        "default": "all"
+      }
+    ],
+    "compounds": []
+  }
+}

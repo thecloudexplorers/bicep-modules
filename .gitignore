@@ -59,3 +59,4 @@ $RECYCLE.BIN/
 .vscode/launch.json
 .vscode/settings.json
 .vscode/settings.json
+testResults/testResults.xml
