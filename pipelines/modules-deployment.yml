@@ -108,6 +108,13 @@ stages:
               arguments: "-WorkingDirectory $(Build.SourcesDirectory) -ModuleName $(bicepModuleName)"
               workingDirectory: "$(Build.SourcesDirectory)"
 
+          - task: CopyFiles@2
+            displayName: Copying test artifacts
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: '**/testResults.xml'
+              TargetFolder: '$(build.artifactstagingdirectory)'
+          
           - task: PublishTestResults@2
             inputs:
               testRunner: "NUnit"
