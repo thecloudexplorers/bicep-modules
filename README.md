@@ -4,12 +4,18 @@ This repository is contains Azure Bicep Modules that can be reused.
 
 The repository is organized in modules and workloads.
 
+- [Azure Bicep Modules](#azure-bicep-modules)
+  - [Build Status](#build-status)
   - [Modules](#modules)
   - [Workloads](#workloads)
   - [Available Modules](#available-modules)
     - [Naming Convention](#naming-convention)
     - [Azure Resources](#azure-resources)
   - [Available Workloads](#available-workloads)
+
+## Build Status
+
+[![Build Status](https://dev.azure.com/thecloudexplorers/Bicep%20Modules/_apis/build/status/Bicep%20modules%20deploy?branchName=master)](https://dev.azure.com/thecloudexplorers/Bicep%20Modules/_build/latest?definitionId=3&branchName=master)
 
 ## Modules
 Modules contains low level implementation of Azure resources, it contains ideally one resource, which must be combined with other resources at Workload level. In certain cases, for some resources might be necessary include extra resources.
