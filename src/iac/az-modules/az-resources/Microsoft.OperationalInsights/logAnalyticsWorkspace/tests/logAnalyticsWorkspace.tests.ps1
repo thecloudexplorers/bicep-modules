@@ -51,7 +51,7 @@ BeforeAll {
         tags=$tags
 }
 
-Describe "Log Analytics Workspace" -Tag loganalyticsworkspace, bicep, azcli {
+Describe "Log Analytics Workspace" -Tag loganalyticsworkspace {
     Context "Validate Log Analytics Workspace" {
 
         It "Log Analytics must no be null" {
