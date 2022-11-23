@@ -16,7 +16,7 @@ $config.TestResult.OutputPath = Join-Path "$WorkingDirectory" -ChildPath "testRe
 $config.Run.Container = $container
 $config.Output.Verbosity = "Detailed"
 
-$tags = @("deployment", "azcli", "bicep")
+$tags = @()
 
 if ($ModuleName -ne "all") {
     $tags += $ModuleName
