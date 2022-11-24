@@ -44,7 +44,7 @@ BeforeAll {
     Write-Host "##[command]Creating bicep deployment dependencies - Scope '$($Context.SQLServerName)'..."
     $tags = ($Context.Tags | ConvertTo-Json -Compress).Replace('"', "'")
 
-    $password = "4oFjPg$#v0+Nr3G-OkI7"
+    $password = '$ecUreP@ssw0rd'
 
     $bicepFile = "$workingDir/src/iac/az-modules/az-resources/Microsoft.Sql/sqlserver/main.bicep"
 

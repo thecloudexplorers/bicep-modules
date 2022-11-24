@@ -17,9 +17,62 @@ Provision a SQL Database instance
 | --- | --- | 
  | Bicep | 0.12.40.16777 | 
 ## Examples
+### Bicep
+```bicep
+@minLength(5)
+@maxLength(50)
+@description('Provide a globally unique name for the resource.')
+param name string = 'sqldatabase${uniqueString(resourceGroup().id)}'
+
+@description('The SQL Server')
+param sqlServerName string
+
+@description('Provide a location.')
+param location string = resourceGroup().location
+
+@description('Provide the tier of your Log Analytics Workspace.')
+param sku string = 'PerGB2018'
+
+@description('Resource Group tags.')
+param tags object = {}
+
+module sqlDatabase 'br:dotcedevcr001.azurecr.io/bicep/modules/sqldatabase:v0.1.0.153-pre-release' = {
+  name: 'logAnalyticsWorkspace'
+  params: {
+    name: name
+    sqlServerName: sqlServerName
+    location: location
+    sku: sku
+    tags: tags
+  }
+}
+```
+### Powershell script
 ```powershell
-az group create -n rg-bicepexample -l westeurope
-az deployment group create -g rg-bicepexample -f main.bicep
+
+$randomId = Get-Random -Minimum 1000 -Maximum 9999
+$resourceGroup = "rg-bicepmodules-$ModuleName-$randomId"
+$region = "westeurope"
+$password = '$ecUreP@ssw0rd'
+$sqlServerAdmin = "adminuser"
+$sQLServerName = "sql-example-$randomId"
+
+Set-Location $PSScriptRoot
+
+az group create -n $resourceGroup -l $region
+
+$sqlServerBicepFile = "../../sqlserver/main.bicep"
+
+az deployment group create `
+    --resource-group $resourceGroup `
+    --template-file $sqlServerBicepFile `
+    --name "example-$randomId" `
+    --parameters `
+    name=$sQLServerName `
+    administratorLogin=$sqlServerAdmin `
+    administratorLoginPassword=$password
+
+az deployment group create -f $PSScriptRoot/example.bicep -g rg-bicepexample
 ```
 ## Inputs
 | Name | Type | Description | DefaultValue | AllowedValues |
