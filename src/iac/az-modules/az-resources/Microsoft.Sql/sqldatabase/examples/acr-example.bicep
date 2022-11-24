@@ -12,7 +12,7 @@ param location string = resourceGroup().location
 @description('Resource Group tags.')
 param tags object = {}
 
-module sqlDatabase 'br:dotcedevcr001.azurecr.io/bicep/modules/sqldatabase:v0.1.0.153-pre-release' = {
+module sqlDatabase 'br:<YOUR ACR NAME>.azurecr.io/bicep/modules/sqldatabase:latest' = {
   name: 'sqldatabase'
   params: {
     name: name
