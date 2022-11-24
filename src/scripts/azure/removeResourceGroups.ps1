@@ -35,7 +35,8 @@ function Remove-ResourceGroup {
                 Write-Host "Removing resource group: $_" -ForegroundColor Yellow
                 az group delete `
                     --name $_ `
-                    --yes
+                    --yes `
+                    --no-wait
             }
         }
     } else {
@@ -51,4 +52,4 @@ if ($ResourceGroupsToRemove -eq "local") {
     $tags.PesterRunId = "local"
 }
 
-Remove-ResourceGroup -Tags $tags
+Remove-ResourceGroup -Tags $tags -IsDryRun $false

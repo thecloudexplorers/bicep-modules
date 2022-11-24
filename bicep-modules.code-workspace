@@ -88,10 +88,11 @@
         "type": "pickString",
         "description": "Bicep Module Name",
         // "default": "all"
-        "default": "sqlserver",
+        "default": "sqldatabase",
         "options": [
           "all",
           "sqlserver",
+          "sqldatabase",
           "loganalyticsworkspace"
         ]
       },

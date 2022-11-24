@@ -1,8 +1,6 @@
 param (
-    [Parameter(Mandatory = $true)]
-    [string]$ModuleName,
-    [Parameter()]
-    [string]$WorkingDirectory = "./"
+    [Parameter(Mandatory = $true)][string]$ModuleName,
+    [Parameter(Mandatory = $false)][string]$WorkingDirectory = "./"
 )
 
 # Find directory based on module name
@@ -11,6 +9,8 @@ $moduleDirectory = Get-ChildItem -Path "$WorkingDirectory/src/iac" -Filter $Modu
 $RunId = (Get-Random -Minimum 1000 -Maximum 9999)
 
 $resourceGroup = "rg-bicepmodules-$ModuleName-$RunId"
+
+Write-Host "Creating resource group: $resourceGroup"
 
 az group create `
     -n $resourceGroup `
