@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.12.40.16777",
-      "templateHash": "16878482056427997475"
+      "templateHash": "3464254660830595750"
     },
     "module": {
       "name": "sqlserver",
@@ -53,13 +53,6 @@
       "defaultValue": {},
       "metadata": {
         "description": "Resource tags."
-      }
-    },
-    "logAnalyticsName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "The name of loganalytics workspace."
       }
     }
   },

@@ -54,8 +54,8 @@ param location string = resourceGroup().location
 @description('Resource Group tags.')
 param tags object = {}
 
-module sqlDatabase 'br:dotcedevcr001.azurecr.io/bicep/modules/sqldatabase:v0.1.0.153-pre-release' = {
-  name: 'logAnalyticsWorkspace'
+module sqlDatabase 'br:<YOUR ACR NAME>.azurecr.io/bicep/modules/sqldatabase:latest' = {
+  name: 'sqldatabase'
   params: {
     name: name
     sqlServerName: sqlServerName
@@ -116,7 +116,6 @@ az deployment group create `
 | Name | Type | Description | DefaultValue | AllowedValues |
 | --- | --- | --- | --- | --- |
  | location| string | The location of the SQL logical server. | [resourceGroup().location] |  |
- | logAnalyticsName| string | The name of loganalytics workspace. |  |  |
  | name| string | The name of the SQL logical server. | [format('database{0}', uniqueString(subscription().subscriptionId, resourceGroup().id))] |  |
  | sku| string |  | Basic | Basic,Standard,Premium,DataWarehouse,Stretch |
  | sqlServerName| string | The SQL Server |  |  |
