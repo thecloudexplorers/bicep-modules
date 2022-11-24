@@ -80,6 +80,19 @@
           "-ModuleName",
           "${input:bicepModuleName}"
         ],
+      },
+      {
+        "name": "[Bicep] Generate README",
+        "type": "PowerShell",
+        "request": "launch",
+        "script": "${workspaceFolder}/src/scripts/azure/bicep/Add-ReadME.ps1",
+        "cwd": "${cwd}",
+        "args": [
+          "-WorkingDirectory",
+          "${workspaceFolder}",
+          "-ModuleName",
+          "${input:bicepModuleName}"
+        ],
       }
     ],
     "inputs": [

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.12.40.16777",
+      "templateHash": "16878482056427997475"
+    },
+    "module": {
+      "name": "sqlserver",
+      "description": "Provision a SQL Database instance",
+      "owner": "Wesley Camargo",
+      "version": "0.1.0"
+    }
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "defaultValue": "[format('database{0}', uniqueString(subscription().subscriptionId, resourceGroup().id))]",
+      "metadata": {
+        "description": "The name of the SQL logical server."
+      },
+      "maxLength": 50,
+      "minLength": 5
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium",
+        "DataWarehouse",
+        "Stretch"
+      ]
+    },
+    "sqlServerName": {
+      "type": "string",
+      "metadata": {
+        "description": "The SQL Server"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location of the SQL logical server."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Resource tags."
+      }
+    },
+    "logAnalyticsName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of loganalytics workspace."
+      }
+    }
+  },
+  "variables": {
+    "databaseName": "[format('{0}/{1}', parameters('sqlServerName'), parameters('name'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[variables('databaseName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[parameters('sku')]",
+        "tier": "[parameters('sku')]"
+      }
+    }
+  ],
+  "outputs": {
+    "databaseName": {
+      "type": "string",
+      "value": "[variables('databaseName')]"
+    },
+    "databaseId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Sql/servers/databases', split(variables('databaseName'), '/')[0], split(variables('databaseName'), '/')[1])]"
+    }
+  }
+}

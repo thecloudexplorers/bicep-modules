@@ -9,19 +9,15 @@ param sqlServerName string
 @description('Provide a location.')
 param location string = resourceGroup().location
 
-@description('Provide the tier of your Log Analytics Workspace.')
-param sku string = 'PerGB2018'
-
 @description('Resource Group tags.')
 param tags object = {}
 
-module sqlDatabase 'br:dotcedevcr001.azurecr.io/bicep/modules/sqldatabase:v0.1.0.153-pre-release' = {
-  name: 'logAnalyticsWorkspace'
+module sqlDatabase '../main.bicep' = {
+  name: 'sqldatabase'
   params: {
     name: name
     sqlServerName: sqlServerName
     location: location
-    sku: sku
     tags: tags
   }
 }
