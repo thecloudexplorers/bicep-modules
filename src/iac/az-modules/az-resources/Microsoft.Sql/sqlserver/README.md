@@ -1,5 +1,6 @@
 # SQL Server Bicep module
 ---
+
 ## Purpose
 Provision a SQL Server instance
 ## Info

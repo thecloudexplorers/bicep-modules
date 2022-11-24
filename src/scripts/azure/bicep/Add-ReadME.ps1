@@ -93,7 +93,7 @@ PROCESS {
                         if ((($templateObject.metadata | Get-Member).name) -match "module") {
                             Write-Verbose ("Description found. Adding to parent page and top of the arm-template specific page")
                             ("# $($templateObject.metadata.module.displayName) Bicep module") | Out-File -FilePath $outputFile -Append
-                            ("---") | Out-File -FilePath $outputFile -Append
+                            ("---`n") | Out-File -FilePath $outputFile -Append
 
                             ("## Purpose") | Out-File -FilePath $outputFile -Append
                             $templateObject.metadata.module.description | Out-File -FilePath $outputFile -Append
