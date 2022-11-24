@@ -80,6 +80,19 @@
           "-ModuleName",
           "${input:bicepModuleName}"
         ],
+      },
+      {
+        "name": "[Bicep] Generate README",
+        "type": "PowerShell",
+        "request": "launch",
+        "script": "${workspaceFolder}/src/scripts/azure/bicep/Add-ReadME.ps1",
+        "cwd": "${cwd}",
+        "args": [
+          "-WorkingDirectory",
+          "${workspaceFolder}",
+          "-ModuleName",
+          "${input:bicepModuleName}"
+        ],
       }
     ],
     "inputs": [
@@ -88,10 +101,11 @@
         "type": "pickString",
         "description": "Bicep Module Name",
         // "default": "all"
-        "default": "sqlserver",
+        "default": "sqldatabase",
         "options": [
           "all",
           "sqlserver",
+          "sqldatabase",
           "loganalyticsworkspace"
         ]
       },
