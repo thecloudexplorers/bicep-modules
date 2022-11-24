@@ -1,3 +1,11 @@
+metadata module = {
+  name: 'sqlserver'
+  displayName: 'SQL Server'
+  description: 'Provision a SQL Server instance'
+  owner: 'Wesley Camargo'
+  version: '0.1.1'
+}
+
 @minLength(5)
 @maxLength(50)
 @description('The name of the SQL logical server.')
@@ -8,7 +16,7 @@ param administratorLogin string = 'adminuser'
 
 @description('The administrator password of the SQL logical server.')
 @secure()
-param administratorLoginPassword string = 'XRC@avk9vqz6nuq7vxe'
+param administratorLoginPassword string = '$ecUreP@ssw0rd'
 
 @description('Provide a location.')
 param location string = resourceGroup().location
