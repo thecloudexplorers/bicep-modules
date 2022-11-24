@@ -30,9 +30,6 @@ param location string = resourceGroup().location
 @description('Resource tags.')
 param tags object = {}
 
-@description('The name of loganalytics workspace.')
-param logAnalyticsName string = ''
-
 var databaseName = '${sqlServerName}/${name}'
 
 resource database 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
