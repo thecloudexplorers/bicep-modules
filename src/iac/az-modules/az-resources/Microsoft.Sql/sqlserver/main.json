@@ -1,0 +1,146 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.12.40.16777",
+      "templateHash": "10171324414327225507"
+    },
+    "module": {
+      "name": "sqlserver",
+      "displayName": "SQL Server",
+      "description": "Provision a SQL Server instance",
+      "owner": "Wesley Camargo",
+      "version": "0.1.1"
+    }
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "defaultValue": "[format('sql-{0}', uniqueString(subscription().subscriptionId, resourceGroup().id))]",
+      "metadata": {
+        "description": "The name of the SQL logical server."
+      },
+      "maxLength": 50,
+      "minLength": 5
+    },
+    "administratorLogin": {
+      "type": "string",
+      "defaultValue": "adminuser",
+      "metadata": {
+        "description": "The administrator username of the SQL logical server."
+      }
+    },
+    "administratorLoginPassword": {
+      "type": "secureString",
+      "defaultValue": "$ecUreP@ssw0rd",
+      "metadata": {
+        "description": "The administrator password of the SQL logical server."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Provide a location."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Resource tags."
+      }
+    },
+    "logAnalyticsName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of loganalytics workspace."
+      }
+    }
+  },
+  "variables": {
+    "masterDatabase": "[format('{0}/master', parameters('name'))]",
+    "diagnosticSettingsName": "SQLSecurityAuditEvents_3d229c42-c7e7-4c97-9a99-ec0d0d8b86c1"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+        "minimalTlsVersion": "1.2"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[variables('masterDatabase')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('name'))]"
+      ]
+    },
+    {
+      "condition": "[not(equals(parameters('logAnalyticsName'), ''))]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[format('Microsoft.Sql/servers/{0}/databases/{1}', split(variables('masterDatabase'), '/')[0], split(variables('masterDatabase'), '/')[1])]",
+      "name": "[variables('diagnosticSettingsName')]",
+      "properties": {
+        "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]",
+        "logs": [
+          {
+            "category": "SQLSecurityAuditEvents",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 0,
+              "enabled": false
+            }
+          },
+          {
+            "category": "DevOpsOperationsAudit",
+            "enabled": true,
+            "retentionPolicy": {
+              "days": 0,
+              "enabled": false
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers/databases', split(variables('masterDatabase'), '/')[0], split(variables('masterDatabase'), '/')[1])]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/auditingSettings",
+      "apiVersion": "2022-05-01-preview",
+      "name": "[format('{0}/DefaultAuditingSettings', parameters('name'))]",
+      "properties": {
+        "state": "Enabled",
+        "isAzureMonitorTargetEnabled": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[format('{0}/AllowAllWindowsAzureIps', parameters('name'))]",
+      "properties": {
+        "endIpAddress": "0.0.0.0",
+        "startIpAddress": "0.0.0.0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', parameters('name'))]"
+      ]
+    }
+  ]
+}
