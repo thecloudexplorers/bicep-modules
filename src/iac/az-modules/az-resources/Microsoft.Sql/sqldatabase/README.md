@@ -78,9 +78,9 @@ az deployment group create -f $PSScriptRoot/example.bicep -g rg-bicepexample
  | sqlServerName| string | The SQL Server |  |  |
  | tags| object | Resource tags. |  |  |
 ## Resources
-| Resource Name | Resource Type | Resource Comment |
-| --- | --- | --- |
- | [variables('databaseName')]| Microsoft.Sql/servers/databases |  | 
+| Resource Name | Resource Type |
+| --- | --- |
+ | [variables('databaseName')]| Microsoft.Sql/servers/databases |
 ## Outputs
 | Name | Type | Output Value |
 | --- | --- | --- |
