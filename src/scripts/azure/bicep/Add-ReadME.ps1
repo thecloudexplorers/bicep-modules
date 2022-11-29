@@ -98,8 +98,8 @@ PROCESS {
                             ("## Purpose") | Out-File -FilePath $outputFile -Append
                             $templateObject.metadata.module.description | Out-File -FilePath $outputFile -Append
 
-                            "## Info" | Out-File -FilePath $outputFile -Append
-                            "**Module Name**: $($templateObject.metadata.module.name)`n" | Out-File -FilePath $outputFile -Append
+                            "`n## Info" | Out-File -FilePath $outputFile -Append
+                            "**Module Name**: $($templateObject.metadata.module.name)" | Out-File -FilePath $outputFile -Append
                             "**Module Version**: $($templateObject.metadata.module.version)`n" | Out-File -FilePath $outputFile -Append
                         }
 

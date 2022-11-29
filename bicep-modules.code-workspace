@@ -106,7 +106,8 @@
           "all",
           "sqlserver",
           "sqldatabase",
-          "loganalyticsworkspace"
+          "loganalyticsworkspace",
+          "keyvault"
         ]
       },
       {
