@@ -53,3 +53,9 @@ if ($ResourceGroupsToRemove -eq "local") {
 }
 
 Remove-ResourceGroup -Tags $tags -IsDryRun $false
+
+$tags = @{
+    ModuleExample = "true"
+}
+
+Remove-ResourceGroup -Tags $tags -IsDryRun $false

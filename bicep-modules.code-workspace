@@ -107,7 +107,9 @@
           "sqlserver",
           "sqldatabase",
           "loganalyticsworkspace",
-          "keyvault"
+          "keyvault",
+          "keyvaultaccesspolicy",
+          "keyvaultsecret"
         ]
       },
       {
