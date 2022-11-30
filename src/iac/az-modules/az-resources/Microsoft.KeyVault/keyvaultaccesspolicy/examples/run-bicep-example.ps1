@@ -18,24 +18,26 @@ if ($ModulesSource -eq "AzureContainerRegistry") {
     $bicepFile = "local-example.bicep"
 }
 
+$Tags = @(
+    "ModuleExample=true"
+    "ToRemove=true"
+)
+
 Write-Host "##[section]Provisioning dependencies" -ForegroundColor Green
 
 Write-Host "##[command]Provisioning resource group" -ForegroundColor Blue
 az group create `
     -n $resourceGroup `
     -l $Region `
-    --tags ModuleExample="true"
+    --tags $Tags
 
-Write-Host "##[command]Provisioning key vault" -ForegroundColor Blue
-$keyVaultBicepModule = "../../keyvault/main.bicep"
+$keyVaultName = "kv-bcp-$moduleName-$randomId"
 
-$keyVaultOutput = az deployment group create `
-    --resource-group $resourceGroup `
-    --template-file $keyVaultBicepModule `
-    --output json `
-| ConvertFrom-Json
-
-$keyVault = $keyVaultOutput.properties.outputs.keyVault_name.value
+az keyvault create `
+    -g $resourceGroup `
+    -n $keyVaultName `
+    -l $Region `
+    --tags $Tags
 
 Write-Host "##[command]Obtaining AAD ObjectId from current user" -ForegroundColor Blue
 $currentUserId = az ad signed-in-user show --query "[id]" -o tsv
@@ -48,6 +50,6 @@ az deployment group create `
     --template-file $bicepFile `
     --name "example-$randomId" `
     --parameters `
-    keyVaultName=$keyVault `
+    keyVaultName=$keyVaultName `
     objectId=$currentUserId `
     secretsAuthorization=$secretPermissions

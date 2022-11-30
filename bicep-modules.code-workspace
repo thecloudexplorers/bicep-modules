@@ -63,10 +63,7 @@
         "request": "launch",
         "script": "${workspaceFolder}/src/scripts/azure/removeResourceGroups.ps1",
         "cwd": "${cwd}",
-        "args": [
-          "-ResourceGroupsToRemove",
-          "${input:resourceGroupsToRemove}"
-        ],
+        "args": [],
       },
       {
         "name": "[Bicep] Run locally",
@@ -110,16 +107,6 @@
           "keyvault",
           "keyvaultaccesspolicy",
           "keyvaultsecret"
-        ]
-      },
-      {
-        "id": "resourceGroupsToRemove",
-        "type": "pickString",
-        "description": "Resource groups to remove",
-        "default": "local",
-        "options": [
-          "all",
-          "local"
         ]
       }
     ],
