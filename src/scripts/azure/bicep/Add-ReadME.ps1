@@ -27,7 +27,13 @@ BEGIN {
 
         # Get module directory
         Write-Host "Building Bicep files..."
-        az bicep build --file "$($ModuleDirectory)/main.bicep"
+        if (Test-Path "$($ModuleDirectory)/main.bicep") {
+            $bicepFile = "$($ModuleDirectory)/main.bicep"
+        } else {
+            $bicepFile = "$($ModuleDirectory)/$ModuleName.bicep"
+        }
+
+        az bicep build --file $bicepFile
     }
 
     function  Get-ModuleDirectory {
@@ -158,11 +164,17 @@ PROCESS {
                     }
 
                     if (Test-Path "$moduleDirectory\examples\runBicep-example.ps1") {
+                        $powershellExample = "$moduleDirectory\examples\runBicep-example.ps1"
+                    } elseif (Test-Path "$moduleDirectory\examples\run-bicep-example.ps1") {
+                        $powershellExample = "$moduleDirectory\examples\run-bicep-example.ps1"
+                    }
+
+                    if ($powershellExample) {
                         ('### Powershell script') | Out-File -FilePath $outputFile -Append
                         $powershellExampleSringBuilder = @()
                         $powershellExampleSringBuilder += '```powershell'
 
-                        Get-Content $moduleDirectory\examples\runBicep-example.ps1 | ForEach-Object {
+                        Get-Content $powershellExample | ForEach-Object {
                             $powershellExampleSringBuilder = $powershellExampleSringBuilder + $_
                         }
 
