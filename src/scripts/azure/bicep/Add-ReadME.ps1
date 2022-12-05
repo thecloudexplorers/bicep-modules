@@ -109,7 +109,7 @@ PROCESS {
                             "**Module Version**: $($templateObject.metadata.module.version)`n" | Out-File -FilePath $outputFile -Append
                         }
 
-                        ("## Requirements") | Out-File -FilePath $outputFile -Append
+                        ("## Prerequisites") | Out-File -FilePath $outputFile -Append
                         $metadataProperties = $templateObject.metadata | Get-Member | Where-Object MemberType -EQ NoteProperty
                         $moduleMetadata = $metadataProperties | Where-Object { $_.Name -eq "_generator" }
 
@@ -182,7 +182,7 @@ PROCESS {
                         $powershellExampleSringBuilder | Out-File -FilePath $outputFile -Append
                     }
 
-                    ("## Inputs") | Out-File -FilePath $outputFile -Append
+                    ("## Parameters") | Out-File -FilePath $outputFile -Append
                     # Create a Parameter List Table
                     $parameterHeader = "| Name | Type | Description | DefaultValue | AllowedValues |"
                     $parameterHeaderDivider = "| --- | --- | --- | --- | --- |"
