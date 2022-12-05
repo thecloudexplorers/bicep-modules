@@ -1,8 +1,6 @@
 param(
     [Parameter()]
-    [string]$workingDir,
-    [Parameter()]
-    [string]$PersistDependencies = $false
+    [string]$workingDir
 )
 
 BeforeAll {
@@ -12,7 +10,7 @@ BeforeAll {
     # Randon id to avoid collisions
     $RunId = (Get-Random -Minimum 1000 -Maximum 9999)
 
-    if ($PersistDependencies) {
+    if ($env:PersistDependencies) {
         if ($env:Pester_Run_Id) {
             $RunId = $env:Pester_Run_Id
             $existingRunId = $true
@@ -289,7 +287,7 @@ Describe "Key Vault" -Tag keyvaultaccesspolicy {
 
     AfterAll {
 
-        if ($PersistDependencies) {
+        if ($env:PersistDependencies) {
             Write-Host "##[warning]Persisting dependencies set 'true'" -ForegroundColor Yellow
             Write-Host "##[warning]Resource group '$($Context.ResourceGroup)' will not be deleted, it must be deleted manually later on..." -ForegroundColor Yellow
         } else {

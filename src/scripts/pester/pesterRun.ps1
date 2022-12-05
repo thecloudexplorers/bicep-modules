@@ -7,7 +7,7 @@ param(
     [string]$PersistDependencies = $false
 )
 
-$container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = $WorkingDirectory; PersistDependencies = $PersistDependencies }
+$container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = $WorkingDirectory }
 
 $config = New-PesterConfiguration
 $config.TestResult.Enabled = $true
