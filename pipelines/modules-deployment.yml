@@ -135,7 +135,7 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
+                $bicepModule = "$(versionFileName)".Replace("version.json", "$(bicepModuleName).bicep")
                 $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
 
                 Write-Host "##[section]Pushing module '$acrVersion' to ACR '$(acrId)'"
