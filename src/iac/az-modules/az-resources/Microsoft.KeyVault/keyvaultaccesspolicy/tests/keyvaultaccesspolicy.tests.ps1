@@ -29,8 +29,12 @@ BeforeAll {
 
     $moduleName = "kvaccesspolicy"
 
-    Write-Host "##[command]Obtaining AAD ObjectId from current user" -ForegroundColor Blue
-    $currentUserId = az ad signed-in-user show --query "[id]" -o tsv
+    if ($env:servicePrincipalId) {
+        $currentUserId = $env:servicePrincipalId
+    } else {
+        Write-Host "##[command]Obtaining AAD ObjectId from current user" -ForegroundColor Blue
+        $currentUserId = az ad signed-in-user show --query "[id]" -o tsv
+    }
 
     $Context = [PSCustomObject]@{
         ResourceGroup = "rg-bicepmodules-$RunId"
