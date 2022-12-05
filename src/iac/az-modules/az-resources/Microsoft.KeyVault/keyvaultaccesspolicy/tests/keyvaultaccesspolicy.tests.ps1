@@ -49,13 +49,13 @@ BeforeAll {
         Write-Host "##[command]Using existing dependencies" -ForegroundColor Blue
     } else {
         Write-Host "##[command]Provisioning dependencies" -ForegroundColor Blue
-        Write-Host "##[command]Provisioning resource group" -ForegroundColor Blue
+        Write-Host "##[command]- Provisioning resource group" -ForegroundColor Blue
         az group create `
             -n $Context.ResourceGroup `
             -l $Context.Location `
             --tags $Context.Tags
 
-        Write-Host "##[command]Provisioning Key Vault" -ForegroundColor Blue
+        Write-Host "##[command]- Provisioning Key Vault" -ForegroundColor Blue
         az keyvault create `
             -g $Context.ResourceGroup `
             -n $Context.KeyVaultName `
@@ -69,7 +69,7 @@ BeforeAll {
 }
 
 
-Describe "Key Vault" -Tag keyvaultaccesspolicy {
+Describe "Key Vault" -Tag keyvaultaccesspolicy -Skip {
     BeforeEach {
         # TODO: Recreate key vault for each test
         Write-Host $Context.ResourceName
@@ -84,15 +84,6 @@ Describe "Key Vault" -Tag keyvaultaccesspolicy {
     }
 
     Context "Validate Key Vault" {
-
-        It "Key Vault must no be null" -Skip {
-            $sqlServer = az keyvault list `
-                --resource-group $Context.ResourceGroup `
-                --query "[?name=='$($Context.ResourceName)']" `
-            | ConvertFrom-Json -AsHashtable
-
-            $sqlServer | Should -Not -Be $null
-        }
 
         It "Key Vault must have the get and list secret permissions only" {
 
