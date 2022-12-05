@@ -31,12 +31,13 @@ az group create `
     -l $Region `
     --tags $Tags
 
+Write-Host "##[command]Provisioning Key Vault" -ForegroundColor Blue
 $keyVaultName = "kv-bcp-$moduleName-$randomId"
-
 az keyvault create `
     -g $resourceGroup `
     -n $keyVaultName `
     -l $Region `
+    --no-self-perms `
     --tags $Tags
 
 Write-Host "##[command]Obtaining AAD ObjectId from current user" -ForegroundColor Blue

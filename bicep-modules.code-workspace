@@ -54,7 +54,9 @@
           "${workspaceFolder}",
           // Specify bicep module name to reduce test scope
           "-ModuleName",
-          "${input:bicepModuleName}"
+          "${input:bicepModuleName}",
+          "-PersistDependencies",
+          "${input:persistDependencies}"
         ],
       },
       {
@@ -107,6 +109,16 @@
           "keyvault",
           "keyvaultaccesspolicy",
           "keyvaultsecret"
+        ]
+      },
+      {
+        "id": "persistDependencies",
+        "type": "pickString",
+        "description": "Persist Dependencies",
+        "default": "true",
+        "options": [
+          "true",
+          "false"
         ]
       }
     ],
