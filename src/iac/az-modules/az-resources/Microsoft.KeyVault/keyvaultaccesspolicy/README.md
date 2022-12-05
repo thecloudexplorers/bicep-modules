@@ -118,7 +118,7 @@ az deployment group create `
     objectId=$currentUserId `
     secretsAuthorization=$secretPermissions
 ```
-## Inputs
+## Parameters
 | Name | Type | Description | DefaultValue | AllowedValues |
 | --- | --- | --- | --- | --- |
  | certificatesAuthorization| array | Certificate permissions to grant to the object ID | System.Object[] | all,backup,create,delete,deleteissuers,get,getissuers,import,list,listissuers,managecontacts,manageissuers,purge,recover,restore,setissuers,update |
