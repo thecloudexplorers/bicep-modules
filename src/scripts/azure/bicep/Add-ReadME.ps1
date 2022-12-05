@@ -27,7 +27,13 @@ BEGIN {
 
         # Get module directory
         Write-Host "Building Bicep files..."
-        az bicep build --file "$($ModuleDirectory)/main.bicep"
+        if (Test-Path "$($ModuleDirectory)/main.bicep") {
+            $bicepFile = "$($ModuleDirectory)/main.bicep"
+        } else {
+            $bicepFile = "$($ModuleDirectory)/$ModuleName.bicep"
+        }
+
+        az bicep build --file $bicepFile
     }
 
     function  Get-ModuleDirectory {
@@ -103,7 +109,7 @@ PROCESS {
                             "**Module Version**: $($templateObject.metadata.module.version)`n" | Out-File -FilePath $outputFile -Append
                         }
 
-                        ("## Requirements") | Out-File -FilePath $outputFile -Append
+                        ("## Prerequisites") | Out-File -FilePath $outputFile -Append
                         $metadataProperties = $templateObject.metadata | Get-Member | Where-Object MemberType -EQ NoteProperty
                         $moduleMetadata = $metadataProperties | Where-Object { $_.Name -eq "_generator" }
 
@@ -158,11 +164,17 @@ PROCESS {
                     }
 
                     if (Test-Path "$moduleDirectory\examples\runBicep-example.ps1") {
+                        $powershellExample = "$moduleDirectory\examples\runBicep-example.ps1"
+                    } elseif (Test-Path "$moduleDirectory\examples\run-bicep-example.ps1") {
+                        $powershellExample = "$moduleDirectory\examples\run-bicep-example.ps1"
+                    }
+
+                    if ($powershellExample) {
                         ('### Powershell script') | Out-File -FilePath $outputFile -Append
                         $powershellExampleSringBuilder = @()
                         $powershellExampleSringBuilder += '```powershell'
 
-                        Get-Content $moduleDirectory\examples\runBicep-example.ps1 | ForEach-Object {
+                        Get-Content $powershellExample | ForEach-Object {
                             $powershellExampleSringBuilder = $powershellExampleSringBuilder + $_
                         }
 
@@ -170,7 +182,7 @@ PROCESS {
                         $powershellExampleSringBuilder | Out-File -FilePath $outputFile -Append
                     }
 
-                    ("## Inputs") | Out-File -FilePath $outputFile -Append
+                    ("## Parameters") | Out-File -FilePath $outputFile -Append
                     # Create a Parameter List Table
                     $parameterHeader = "| Name | Type | Description | DefaultValue | AllowedValues |"
                     $parameterHeaderDivider = "| --- | --- | --- | --- | --- |"

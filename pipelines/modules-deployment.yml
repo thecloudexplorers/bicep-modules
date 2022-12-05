@@ -104,6 +104,7 @@ stages:
               azureSubscription: "ServicePrincipal"
               scriptType: "pscore"
               scriptLocation: "scriptPath"
+              addSpnToEnvironment: true
               scriptPath: "$(Build.SourcesDirectory)/src/scripts/pester/pesterRun.ps1"
               arguments: "-WorkingDirectory $(Build.SourcesDirectory) -ModuleName $(bicepModuleName)"
               workingDirectory: "$(Build.SourcesDirectory)"
@@ -114,7 +115,7 @@ stages:
               SourceFolder: '$(Build.SourcesDirectory)'
               Contents: '**/testResults.xml'
               TargetFolder: '$(build.artifactstagingdirectory)'
-          
+
           - task: PublishTestResults@2
             inputs:
               testRunner: "NUnit"
@@ -134,7 +135,7 @@ stages:
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
-                $bicepModule = "$(versionFileName)".Replace("version.json", "main.bicep")
+                $bicepModule = "$(versionFileName)".Replace("version.json", "$(bicepModuleName).bicep")
                 $acrVersion = "$(bicepModuleName):v$(bicepModuleVersion)"
 
                 Write-Host "##[section]Pushing module '$acrVersion' to ACR '$(acrId)'"

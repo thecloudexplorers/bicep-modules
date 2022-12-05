@@ -1,0 +1,126 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.12.40.16777",
+      "templateHash": "14278624239822395260"
+    },
+    "module": {
+      "name": "keyvaultaccesspolicy",
+      "displayName": "Key Vault Access Policy",
+      "description": "Provisions access policies in an existing Azure Key Vault",
+      "owner": "Wesley Camargo",
+      "version": "0.1.0"
+    }
+  },
+  "parameters": {
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Key Vault to provision the access policy in"
+      }
+    },
+    "objectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD object ID to grant access to"
+      }
+    },
+    "secretsAuthorization": {
+      "type": "array",
+      "allowedValues": [
+        "all",
+        "backup",
+        "delete",
+        "get",
+        "list",
+        "purge",
+        "recover",
+        "restore",
+        "set"
+      ],
+      "defaultValue": [],
+      "metadata": {
+        "description": "Secret permissions to grant to the object ID"
+      }
+    },
+    "keysAuthorization": {
+      "type": "array",
+      "allowedValues": [
+        "all",
+        "backup",
+        "create",
+        "decrypt",
+        "delete",
+        "encrypt",
+        "get",
+        "getrotationpolicy",
+        "import",
+        "list",
+        "purge",
+        "recover",
+        "release",
+        "restore",
+        "rotate",
+        "setrotationpolicy",
+        "sign",
+        "unwrapKey",
+        "update",
+        "verify",
+        "wrapKey"
+      ],
+      "defaultValue": [],
+      "metadata": {
+        "description": "Key permissions to grant to the object ID"
+      }
+    },
+    "certificatesAuthorization": {
+      "type": "array",
+      "allowedValues": [
+        "all",
+        "backup",
+        "create",
+        "delete",
+        "deleteissuers",
+        "get",
+        "getissuers",
+        "import",
+        "list",
+        "listissuers",
+        "managecontacts",
+        "manageissuers",
+        "purge",
+        "recover",
+        "restore",
+        "setissuers",
+        "update"
+      ],
+      "defaultValue": [],
+      "metadata": {
+        "description": "Certificate permissions to grant to the object ID"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2022-07-01",
+      "name": "[format('{0}/add', parameters('keyVaultName'))]",
+      "properties": {
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[parameters('objectId')]",
+            "permissions": {
+              "secrets": "[parameters('secretsAuthorization')]",
+              "keys": "[parameters('keysAuthorization')]",
+              "certificates": "[parameters('certificatesAuthorization')]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -2,7 +2,9 @@ param(
     [Parameter()]
     [string]$WorkingDirectory,
     [Parameter()]
-    [string]$ModuleName
+    [string]$ModuleName,
+    [Parameter()]
+    [string]$PersistDependencies = $false
 )
 
 $container = New-PesterContainer -Path "*.tests.ps1" -Data @{ workingDir = $WorkingDirectory }

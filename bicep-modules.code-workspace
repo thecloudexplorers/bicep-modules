@@ -54,7 +54,9 @@
           "${workspaceFolder}",
           // Specify bicep module name to reduce test scope
           "-ModuleName",
-          "${input:bicepModuleName}"
+          "${input:bicepModuleName}",
+          "-PersistDependencies",
+          "${input:persistDependencies}"
         ],
       },
       {
@@ -63,10 +65,7 @@
         "request": "launch",
         "script": "${workspaceFolder}/src/scripts/azure/removeResourceGroups.ps1",
         "cwd": "${cwd}",
-        "args": [
-          "-ResourceGroupsToRemove",
-          "${input:resourceGroupsToRemove}"
-        ],
+        "args": [],
       },
       {
         "name": "[Bicep] Run locally",
@@ -107,17 +106,19 @@
           "sqlserver",
           "sqldatabase",
           "loganalyticsworkspace",
-          "keyvault"
+          "keyvault",
+          "keyvaultaccesspolicy",
+          "keyvaultsecret"
         ]
       },
       {
-        "id": "resourceGroupsToRemove",
+        "id": "persistDependencies",
         "type": "pickString",
-        "description": "Resource groups to remove",
-        "default": "local",
+        "description": "Persist Dependencies",
+        "default": "true",
         "options": [
-          "all",
-          "local"
+          "true",
+          "false"
         ]
       }
     ],
