@@ -44,7 +44,7 @@ stages:
             enabled: true
             condition: eq(${{ parameters.DeployACR }}, 'true')
             inputs:
-              azureSubscription: "ServicePrincipal"
+              azureSubscription: "ServiceConnection"
               scriptType: "pscore"
               scriptLocation: "inlineScript"
               inlineScript: |
@@ -71,7 +71,7 @@ stages:
             enabled: true
             condition: eq(${{ parameters.DeployACR }}, 'true')
             inputs:
-              azureSubscription: "ServicePrincipal"
+              azureSubscription: "ServiceConnection"
               scriptType: "pscore"
               scriptLocation: "inlineScript"
               inlineScript: |
@@ -101,7 +101,7 @@ stages:
             enabled: true
             condition: and(eq(${{ parameters.PopulateACR }}, 'true'), eq(${{ parameters.DeployACR }}, 'true'))
             inputs:
-              azureSubscription: "ServicePrincipal"
+              azureSubscription: "ServiceConnection"
               scriptType: "pscore"
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
@@ -132,7 +132,7 @@ stages:
             enabled: true
             condition: and(eq(${{ parameters.PopulateACR }}, 'true'), eq(${{ parameters.DeployACR }}, 'true'))
             inputs:
-              azureSubscription: "ServicePrincipal"
+              azureSubscription: "ServiceConnection"
               scriptType: "pscore"
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
@@ -163,7 +163,7 @@ stages:
             enabled: true
             condition: eq(${{ parameters.GitTagVersions }}, 'true')
             inputs:
-              azureSubscription: "ServicePrincipal"
+              azureSubscription: "ServiceConnection"
               scriptType: "pscore"
               scriptLocation: "inlineScript"
               workingDirectory: $(Build.SourcesDirectory)
